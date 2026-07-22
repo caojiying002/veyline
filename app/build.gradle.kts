@@ -36,6 +36,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        viewBinding = true
         compose = true
     }
 }
@@ -49,6 +50,16 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // View 体系基础组件（用于与 Compose 混合开发）
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.fragment.compose)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.viewpager2)
+
+    // 测试依赖
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
