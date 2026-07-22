@@ -4,16 +4,18 @@
    for details.
 -->
 <data-extraction-rules>
+    <!-- 空节点：不备份任何数据到云端 -->
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
     </cloud-backup>
     <!--
-    <device-transfer>
-        <include .../>
-        <exclude .../>
-    </device-transfer>
+        ⚠️ 警告：device-transfer 节点必须保留，且不得添加任何 <include> 规则！
+        空节点的语义是"D2D 设备间传输不迁移任何应用数据"。
+
+        背景：Android 12+ 将备份拆分为云备份（cloud-backup）和设备间传输（device-transfer）
+        两条独立通道。allowBackup="false" 只能封堵云备份，对 D2D 通道无效。
+        必须通过此空节点显式封堵，否则用户换机时 App 私有数据（含 Token）
+        会被完整迁移到新设备。
     -->
+    <device-transfer>
+    </device-transfer>
 </data-extraction-rules>

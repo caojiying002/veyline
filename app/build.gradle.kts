@@ -26,6 +26,9 @@ android {
             optimization {
                 enable = false
             }
+            // 正式打release包不应该用debug版本的keystore，这里签名只是为了让release包能正常安装运行
+            // 有时候需要查看release包运行起来的一些特性，比如日志打印是否隐藏
+            //signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
