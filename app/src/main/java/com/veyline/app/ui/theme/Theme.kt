@@ -53,7 +53,6 @@ fun VeylineTheme(
     CompositionLocalProvider(LocalVeylineColors provides veylineColors) {
         MaterialTheme(
             colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
-            typography = Typography,
             //shapes = Shapes,         // 可自定义 Shape.kt
             content = content
         )
