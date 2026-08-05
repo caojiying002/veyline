@@ -2,6 +2,7 @@ package com.veyline.app.ui.theme
 
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 
@@ -25,18 +26,28 @@ object VeylineTextStyles {
     val Title = TextStyle(
         fontSize = 18.sp,
         lineHeight = 22.sp,
+        fontWeight = FontWeight.Normal,
     ).withLineHeightFix()
 
     /** 正文、描述等常规文本，字号 14sp，行高 18sp。 */
     val Body = TextStyle(
         fontSize = 14.sp,
         lineHeight = 18.sp,
+        fontWeight = FontWeight.Normal,
     ).withLineHeightFix()
 
     /** 时间、浏览量、发布者等辅助信息文本，字号 11sp，行高 14sp。 */
     val Meta = TextStyle(
         fontSize = 11.sp,
         lineHeight = 14.sp,
+        fontWeight = FontWeight.Normal,
+    ).withLineHeightFix()
+
+    /** 按钮文字，字号 15sp，行高 20sp。 */
+    val Button = TextStyle(
+        fontSize = 15.sp,
+        lineHeight = 20.sp,
+        fontWeight = FontWeight.Normal,
     ).withLineHeightFix()
 }
 

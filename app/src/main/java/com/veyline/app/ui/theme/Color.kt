@@ -2,9 +2,6 @@ package com.veyline.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-internal val Black = Color(0xFF000000)
-internal val White = Color(0xFFFFFFFF)
-
 // Light Theme Colors
 internal val Background = Color(0xFFF5F5F5)
 internal val Primary = Color(0xFFEC4899)
@@ -30,8 +27,8 @@ internal val TextItemTitle = Color(0xFF262626)
 internal val TextTitle = Color(0xFF222222)
 internal val TextContent = Color(0xFF525252)
 internal val TextLight = Color(0xFFA3A3A3)
-internal val TextPrice = Black
-internal val TextOnButton = White
+internal val TextPrice = Color.Black
+internal val TextOnButton = Color.White
 internal val TextWarningYellow = Color(0xFFDE983F)
 
 // Text Colors (Dark)
@@ -40,8 +37,8 @@ internal val TextItemTitleDark = Color(0xFFF0F0F0)
 internal val TextTitleDark = Color(0xFFE6E6E6)
 internal val TextContentDark = Color(0xFFCCCCCC)
 internal val TextLightDark = Color(0xFFA0A0A0)
-internal val TextPriceDark = White
-internal val TextOnButtonDark = White
+internal val TextPriceDark = Color.White
+internal val TextOnButtonDark = Color.White
 internal val TextWarningYellowDark = Color(0xFFF0AE52)
 
 // Button Colors (Light)

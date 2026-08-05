@@ -25,6 +25,7 @@ data class VeylineColors(
     val textWarningYellow: Color,
     val textOnButton: Color,
     // 按钮色
+    val buttonDefault: Color,
     val buttonPressed: Color,
     val buttonDisabled: Color,
     val buttonPressedSecondary: Color,
@@ -47,6 +48,7 @@ internal val lightVeylineColors = VeylineColors(
     textPrice = TextPrice,
     textWarningYellow = TextWarningYellow,
     textOnButton = TextOnButton,
+    buttonDefault = Primary,
     buttonPressed = ButtonPressed,
     buttonDisabled = ButtonDisabled,
     buttonPressedSecondary = ButtonPressedSecondary,
@@ -69,6 +71,7 @@ internal val darkVeylineColors = VeylineColors(
     textPrice = TextPriceDark,
     textWarningYellow = TextWarningYellowDark,
     textOnButton = TextOnButtonDark,
+    buttonDefault = PrimaryDark,
     buttonPressed = ButtonPressedDark,
     buttonDisabled = ButtonDisabledDark,
     buttonPressedSecondary = ButtonPressedSecondaryDark,
@@ -76,5 +79,6 @@ internal val darkVeylineColors = VeylineColors(
 
 internal val LocalVeylineColors = staticCompositionLocalOf<VeylineColors> {
     // fail-fast
-    error("VeylineColors is not provided")
+    val name = "VeylineColors"
+    error("CompositionLocal $name not present")
 }

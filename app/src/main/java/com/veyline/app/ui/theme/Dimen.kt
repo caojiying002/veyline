@@ -1,7 +1,6 @@
 package com.veyline.app.ui.theme
 
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 // Common spacings
 val SpacingSmall = 4.dp
@@ -18,7 +17,7 @@ val DefaultVerticalSpace = 10.dp
 
 // Button
 val ButtonHeight = 48.dp
-val ButtonTextSize = 15.sp
+val ButtonCornerRadius = 4.dp
 
 // Card
 val CardCornerRadius = 6.dp
