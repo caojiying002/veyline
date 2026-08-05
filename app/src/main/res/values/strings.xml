@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Veyline</string>
+
+    <string name="action_back">返回</string>
+    <string name="action_confirm">确定</string>
+    <string name="action_quit">退出</string>
+    <string name="action_exit">@string/action_quit</string>
+    <string name="action_retry">重试</string>
+
+
 </resources>
