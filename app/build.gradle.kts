@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -64,6 +65,14 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.viewpager2)
+
+    // 网络请求与 JSON 解析
+    implementation(libs.squareup.retrofit)
+    implementation(libs.squareup.retrofit.converter.moshi)
+    ksp(libs.squareup.moshi.kotlin.codegen)
+    implementation(libs.squareup.moshi)
+    implementation(libs.squareup.okhttp)
+    implementation(libs.squareup.okhttp.logginginterceptor)
 
     // 测试依赖
     testImplementation(libs.junit)
