@@ -20,7 +20,7 @@ package com.veyline.app.data.network.model
  * `JsonAdapter.Factory` 统一选择解析策略。具体的 Request、Response 等业务数据类没有这种
  * 多态结构，仍应优先使用 `@JsonClass(generateAdapter = true)` 生成 Adapter，避免反射解析。
  *
- * [code] 是判断响应语义所必需的字段；[msg] 与 [data] 允许为空。计划使用的自定义
+ * [code] 是判断响应语义所必需的字段；[msg] 与 [data] 允许为空。自定义
  * Adapter 会显式处理字段缺失和 JSON `null`，因此这里是否提供 Kotlin 默认值不会改变
  * 网络解析行为。
  *
