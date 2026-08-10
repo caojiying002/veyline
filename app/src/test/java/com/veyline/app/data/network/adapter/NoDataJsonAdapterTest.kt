@@ -6,6 +6,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Test
 
+/**
+ * 验证 [NoDataJsonAdapter] 对无业务含义占位值的宽容解析契约。
+ *
+ * 测试覆盖常见占位形式、复杂 JSON 值的完整消费以及固定的序列化结果。这里不验证 HTTP
+ * 空响应体；`NoData` 只用于响应壳存在、但 `data` 没有业务含义的场景。
+ *
+ * 测试方法统一使用“`fromJson`/`toJson` + `with` 条件 + 预期行为”的命名格式。
+ */
 class NoDataJsonAdapterTest {
 
     private val moshi = Moshi.Builder()
@@ -14,38 +22,43 @@ class NoDataJsonAdapterTest {
 
     private val adapter = moshi.adapter(NoData::class.java)
 
+    /** 验证 JSON `null` 被转换为唯一的 [NoData] 实例。 */
     @Test
-    fun `deserialize null returns NoData`() {
+    fun `fromJson with JSON null returns NoData`() {
         val result = adapter.fromJson("null")
 
         assertSame(NoData, result)
     }
 
+    /** 验证服务端使用空字符串占位时仍能得到 [NoData]。 */
     @Test
-    fun `deserialize empty string returns NoData`() {
+    fun `fromJson with empty string returns NoData`() {
         val result = adapter.fromJson("\"\"")
 
         assertSame(NoData, result)
     }
 
+    /** 验证服务端使用空对象占位时仍能得到 [NoData]。 */
     @Test
-    fun `deserialize empty object returns NoData`() {
+    fun `fromJson with empty object returns NoData`() {
         val result = adapter.fromJson("{}")
 
         assertSame(NoData, result)
     }
 
+    /** 验证 Adapter 能完整消费包含多种 Token 的嵌套 JSON 值。 */
     @Test
-    fun `deserialize nested array returns NoData`() {
+    fun `fromJson with nested array returns NoData`() {
         val result = adapter.fromJson(
-            """[null, "", 1, true, {"key": "value"}]"""
+            """[null, "", 1, true, {"key": "value"}]""",
         )
 
         assertSame(NoData, result)
     }
 
+    /** 验证 [NoData] 始终序列化为 JSON `null`。 */
     @Test
-    fun `serialize NoData returns null`() {
+    fun `toJson with NoData returns JSON null`() {
         val result = adapter.toJson(NoData)
 
         assertEquals("null", result)
