@@ -49,3 +49,4 @@ local/
 
 # 私有项目源码，仅用于本地脱敏迁移
 /.private-source/
+/.migration/
