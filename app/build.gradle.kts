@@ -7,6 +7,19 @@ plugins {
     alias(libs.plugins.hilt.android)
 }
 
+// 真实 API 地址由用户级 Gradle Property 或命令行 -P 参数提供，避免写入公开仓库。
+// 未配置时使用保留的无效域名，使公开项目仍可正常编译和运行。
+val apiBaseUrl = providers.gradleProperty("VEYLINE_API_BASE_URL")
+    .orElse("https://example.invalid/")
+    .get()
+
+require(apiBaseUrl.startsWith("https://")) {
+    "VEYLINE_API_BASE_URL must use HTTPS"
+}
+require(apiBaseUrl.endsWith('/')) {
+    "VEYLINE_API_BASE_URL must end with '/'"
+}
+
 android {
     namespace = "com.veyline.app"
     compileSdk {
@@ -23,6 +36,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 将构建时解析的地址写入 AGP 生成的 BuildConfig，供网络层统一读取。
+        buildConfigField(
+            "String",
+            "API_BASE_URL",
+            "\"$apiBaseUrl\"",
+        )
     }
 
     buildTypes {
@@ -40,6 +60,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
         compose = true
     }
