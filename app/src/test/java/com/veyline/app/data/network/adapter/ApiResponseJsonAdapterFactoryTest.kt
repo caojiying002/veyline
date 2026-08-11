@@ -5,8 +5,10 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.NoData
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -26,18 +28,24 @@ class ApiResponseJsonAdapterFactoryTest {
         .add(NoDataJsonAdapter())
         .build()
 
-    private val responseType = Types.newParameterizedType(
+    private val stringResponseType = Types.newParameterizedType(
         ApiResponse::class.java,
         String::class.java,
     )
+    private val stringAdapter: JsonAdapter<ApiResponse<String>> =
+        moshi.adapter(stringResponseType)
 
-    private val adapter: JsonAdapter<ApiResponse<String>> =
-        moshi.adapter(responseType)
+    private val noDataResponseType = Types.newParameterizedType(
+        ApiResponse::class.java,
+        NoData::class.java,
+    )
+    private val noDataAdapter: JsonAdapter<ApiResponse<NoData>> =
+        moshi.adapter(noDataResponseType)
 
     /** 验证业务成功时按照声明的泛型解析 `data`。 */
     @Test
     fun `fromJson with successful response parses String data`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """{"code":0,"msg":"success","data":"value"}""",
         )
 
@@ -48,10 +56,38 @@ class ApiResponseJsonAdapterFactoryTest {
         assertNull(result.fieldErrors)
     }
 
+    /** 验证普通成功响应缺少 `data` 字段时保留数据缺失状态。 */
+    @Test
+    fun `fromJson with successful String response without data returns null data`() {
+        val result = stringAdapter.fromJson(
+            """{"code":0,"msg":"success"}""",
+        )
+
+        requireNotNull(result)
+        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals("success", result.msg)
+        assertNull(result.data)
+        assertNull(result.fieldErrors)
+    }
+
+    /** 验证无业务数据的成功响应缺少 `data` 字段时补充 [NoData]。 */
+    @Test
+    fun `fromJson with successful NoData response without data returns NoData`() {
+        val result = noDataAdapter.fromJson(
+            """{"code":0,"msg":"success"}""",
+        )
+
+        requireNotNull(result)
+        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals("success", result.msg)
+        assertSame(NoData, result.data)
+        assertNull(result.fieldErrors)
+    }
+
     /** 验证 `code` 位于 `data` 之后时，两阶段解析仍能正确选择数据 Adapter。 */
     @Test
     fun `fromJson with data before code parses successfully`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """{"data":"value","msg":"success","code":0}""",
         )
 
@@ -65,7 +101,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证表单验证失败时将原始 `data` 解析为字段错误。 */
     @Test
     fun `fromJson with validation error parses field errors`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """
             {
               "code": -1,
@@ -94,7 +130,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证验证错误中的 `data: null` 被归一为空字段错误 Map。 */
     @Test
     fun `fromJson with null validation data returns empty field errors`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """
             {
               "code": -1,
@@ -117,7 +153,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证验证错误缺少 `data` 字段时仍返回空字段错误 Map。 */
     @Test
     fun `fromJson with validation error without data returns empty field errors`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """
             {
               "code": -1,
@@ -139,7 +175,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证普通业务错误会跳过与成功类型不兼容的 `data`。 */
     @Test
     fun `fromJson with business error ignores incompatible data`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """
             {
               "code": 1000,
@@ -162,7 +198,7 @@ class ApiResponseJsonAdapterFactoryTest {
     @Test
     fun `fromJson without code throws JsonDataException`() {
         assertThrows(JsonDataException::class.java) {
-            adapter.fromJson(
+            stringAdapter.fromJson(
                 """{"msg":"failed","data":null}""",
             )
         }
@@ -172,7 +208,7 @@ class ApiResponseJsonAdapterFactoryTest {
     @Test
     fun `fromJson with null code throws JsonDataException`() {
         assertThrows(JsonDataException::class.java) {
-            adapter.fromJson(
+            stringAdapter.fromJson(
                 """{"code":null,"msg":"failed","data":null}""",
             )
         }
@@ -182,7 +218,7 @@ class ApiResponseJsonAdapterFactoryTest {
     @Test
     fun `fromJson with invalid code type throws JsonDataException`() {
         assertThrows(JsonDataException::class.java) {
-            adapter.fromJson(
+            stringAdapter.fromJson(
                 """{"code":true,"msg":"failed","data":null}""",
             )
         }
@@ -191,7 +227,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证新增的未知字段不会影响既有响应字段解析。 */
     @Test
     fun `fromJson with unknown field parses known fields`() {
-        val result = adapter.fromJson(
+        val result = stringAdapter.fromJson(
             """
             {
               "code": 0,
@@ -220,7 +256,7 @@ class ApiResponseJsonAdapterFactoryTest {
             data = "value",
         )
 
-        val result = adapter.toJson(response)
+        val result = stringAdapter.toJson(response)
 
         assertEquals(
             """{"code":0,"msg":"success","data":"value"}""",
@@ -241,7 +277,7 @@ class ApiResponseJsonAdapterFactoryTest {
             ),
         )
 
-        val result = adapter.toJson(response)
+        val result = stringAdapter.toJson(response)
 
         assertEquals(
             """{"code":-1,"msg":"validation failed","data":{"username":"required","password":"too short"}}""",
