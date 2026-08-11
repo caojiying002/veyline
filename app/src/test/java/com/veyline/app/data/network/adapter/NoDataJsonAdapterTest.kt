@@ -10,7 +10,7 @@ import org.junit.Test
  * 验证 [NoDataJsonAdapter] 对无业务含义占位值的宽容解析契约。
  *
  * 测试覆盖常见占位形式、复杂 JSON 值的完整消费以及固定的序列化结果。这里不验证 HTTP
- * 空响应体；`NoData` 只用于响应壳存在、但 `data` 没有业务含义的场景。
+ * 空响应体；[NoData] 只表示 `data` 字段没有业务含义可以被客户端忽略。
  *
  * 测试方法统一使用“`fromJson`/`toJson` + `with` 条件 + 预期行为”的命名格式。
  */

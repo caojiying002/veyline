@@ -16,7 +16,7 @@ package com.veyline.app.data.network.model
  * ## Moshi Adapter 策略
  *
  * 本类型不使用 `@JsonClass(generateAdapter = true)`。`ApiResponse<T>` 是所有接口共享的泛型
- * 响应壳，并且 `data` 会随业务状态码在 `T` 与字段错误对象之间变化，需要由自定义
+ * 响应包装结构，并且 `data` 会随业务状态码在 `T` 与字段错误对象之间变化，需要由自定义
  * `JsonAdapter.Factory` 统一选择解析策略。具体的 Request、Response 等业务数据类没有这种
  * 多态结构，仍应优先使用 `@JsonClass(generateAdapter = true)` 生成 Adapter，避免反射解析。
  *

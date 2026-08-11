@@ -13,7 +13,7 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 
 /**
- * 验证 [ApiResponseJsonAdapterFactory] 对通用响应壳及多态 `data` 字段的解析契约。
+ * 验证 [ApiResponseJsonAdapterFactory] 对 [ApiResponse] 及其多态 `data` 字段的解析契约。
  *
  * 测试覆盖成功、表单验证失败、普通业务失败、字段乱序、未知字段、必需状态码异常以及
  * 序列化分支。泛型使用 `String` 是为了隔离并验证 Factory 的类型分派行为，不表示 Factory

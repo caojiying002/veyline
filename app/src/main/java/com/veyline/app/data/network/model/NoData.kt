@@ -3,7 +3,7 @@ package com.veyline.app.data.network.model
 /**
  * 表示 API 调用成功，但响应中没有需要使用的业务数据。
  *
- * 对于仍然返回 [ApiResponse] 响应壳、但 `data` 只是 `null`、空字符串或其他无意义占位值
+ * 对于仍然返回 [ApiResponse] 结构、但 `data` 只是 `null`、空字符串或其他无意义占位值
  * 的接口，将响应类型声明为 `ApiResponse<NoData>`。自定义 JsonAdapter 会忽略 `data` 的
  * 具体 JSON 值并将其解析为 [NoData]，调用方因此不需要为无意义的字段创建业务模型。
  *

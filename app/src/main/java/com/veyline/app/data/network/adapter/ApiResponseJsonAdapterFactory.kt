@@ -58,7 +58,7 @@ class ApiResponseJsonAdapterFactory : JsonAdapter.Factory {
 }
 
 /**
- * 根据 [ApiResponse.code] 解析通用响应壳的 JSON Adapter。
+ * 根据 `code` 字段的值区分解析 [ApiResponse] 的 JSON Adapter。
  *
  * 业务成功时，使用响应声明的泛型 Adapter 解析 `data`；表单验证失败时，
  * 将 `data` 解析为字段错误 Map；其他业务失败则跳过 `data`，避免错误响应中的

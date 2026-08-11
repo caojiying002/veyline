@@ -13,16 +13,16 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 /**
- * 执行要求返回 [ApiResponse] 响应壳的 Retrofit 调用，并转换为 [ApiResult]。
+ * 执行要求返回 [ApiResponse] 通用响应结构的 Retrofit 调用，并转换为 [ApiResult]。
  *
  * 本函数只处理一次请求，不额外创建 `Flow`，也不切换协程 Dispatcher。Retrofit 的 suspend
  * 调用已经异步执行网络请求；Repository 可以根据缓存、轮询或多次发射等真实需求决定是否
  * 在更高层使用 `Flow`。
  *
- * 本函数适用于绝大多数成功时必须返回 HTTP Body，且 Body 为 [ApiResponse] 响应壳的接口。
- * 对于 `204 No Content` 等协议明确允许成功响应没有 Body 的少数接口，应改用
- * `apiCallNoContent()`；如果误用本函数，空 Body 会以 [EmptyResponseBodyException] 为原因
- * 返回 [ApiResult.Failure.Serialization]。
+ * 本函数适用于绝大多数成功时必须返回 HTTP 响应体，且响应体内容为 [ApiResponse]
+ * 响应结构的接口。对于 `204 No Content` 等协议明确允许成功响应没有响应体的
+ * 少数接口，应改用 `apiCallNoContent()`；如果误用本函数，空响应体会以
+ * [EmptyResponseBodyException] 为原因返回 [ApiResult.Failure.Serialization]。
  *
  * @param call 返回 `Response<ApiResponse<T>>` 的 Retrofit suspend 调用。
  */
@@ -47,8 +47,8 @@ suspend fun <T : Any> apiCall(
                 message = apiResponse.msg.orEmpty(),
             )
 
-            // 响应壳存在但 data 没有业务含义时应声明 ApiResponse<NoData>；
-            // 其他成功响应缺少必需 data 属于协议异常。
+            // 接口成功时没有业务数据，应将通用响应类型声明为 ApiResponse<NoData>；
+            // 其他成功响应缺少必需的 data 属于协议异常。
             apiResponse.data == null -> ApiResult.Failure.Serialization(
                 MissingDataException(),
             )
@@ -58,15 +58,15 @@ suspend fun <T : Any> apiCall(
     }
 
 /**
- * 执行成功响应不包含 HTTP Body 的 Retrofit 调用，并转换为 [ApiResult]。
+ * 执行成功响应不包含 HTTP 响应体的 Retrofit 调用，并转换为 [ApiResult]。
  *
- * 当前项目的后端接口成功时均返回 Body，暂无调用方使用本函数。网络层仍保留该能力，
- * 用于兼容 `204 No Content` 等协议明确允许成功响应没有 Body 的接口，以及响应按语义
- * 不包含 Body 的 HTTP `HEAD` 请求。
+ * 当前项目的后端接口成功时均返回响应体，暂无调用方使用本函数。网络层仍保留该能力，
+ * 用于兼容 `204 No Content` 等协议明确允许成功响应没有响应体的接口，以及按语义不包含
+ * 响应体的 HTTP `HEAD` 请求。
  *
  * 任何 2XX 响应都转换为包含 [NoData] 的 [ApiResult.Success]；HTTP 错误、网络异常与
- * 协程取消仍由通用调用逻辑统一处理。对于成功时必须返回 [ApiResponse] 响应壳的接口，
- * 应使用 [apiCall]，不能通过本函数绕过业务状态码和响应数据校验。
+ * 协程取消仍由通用调用逻辑统一处理。对于成功时必须在响应体中返回 [ApiResponse]
+ * 结构的接口，应使用 [apiCall]，不能通过本函数绕过业务状态码和响应数据校验。
  *
  * @param call 返回 `Response<Unit>` 的 Retrofit suspend 调用。
  */
