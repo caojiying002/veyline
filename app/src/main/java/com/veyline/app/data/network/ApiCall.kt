@@ -6,6 +6,7 @@ import com.veyline.app.data.network.exception.EmptyResponseBodyException
 import com.veyline.app.data.network.exception.MissingDataException
 import com.veyline.app.data.network.model.ApiResponse
 import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.model.NoData
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import retrofit2.HttpException
@@ -54,6 +55,26 @@ suspend fun <T : Any> apiCall(
 
             else -> ApiResult.Success(apiResponse.data)
         }
+    }
+
+/**
+ * 执行成功响应不包含 HTTP Body 的 Retrofit 调用，并转换为 [ApiResult]。
+ *
+ * 当前项目的后端接口成功时均返回 Body，暂无调用方使用本函数。网络层仍保留该能力，
+ * 用于兼容 `204 No Content` 等协议明确允许成功响应没有 Body 的接口，以及响应按语义
+ * 不包含 Body 的 HTTP `HEAD` 请求。
+ *
+ * 任何 2XX 响应都转换为包含 [NoData] 的 [ApiResult.Success]；HTTP 错误、网络异常与
+ * 协程取消仍由通用调用逻辑统一处理。对于成功时必须返回 [ApiResponse] 响应壳的接口，
+ * 应使用 [apiCall]，不能通过本函数绕过业务状态码和响应数据校验。
+ *
+ * @param call 返回 `Response<Unit>` 的 Retrofit suspend 调用。
+ */
+suspend fun apiCallNoContent(
+    call: suspend () -> Response<Unit>,
+): ApiResult<NoData> =
+    executeApiCall(call) { _ ->
+        ApiResult.Success(NoData)
     }
 
 /** 执行 HTTP 调用并统一处理与响应业务结构无关的失败。 */
