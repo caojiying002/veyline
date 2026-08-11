@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -35,8 +36,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         viewBinding = true
@@ -69,10 +70,14 @@ dependencies {
     // 网络请求与 JSON 解析
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.moshi)
-    ksp(libs.squareup.moshi.kotlin.codegen)
     implementation(libs.squareup.moshi)
+    ksp(libs.squareup.moshi.kotlin.codegen)
     implementation(libs.squareup.okhttp)
     implementation(libs.squareup.okhttp.logginginterceptor)
+
+    // 依赖注入
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     // 测试依赖
     testImplementation(libs.junit)
