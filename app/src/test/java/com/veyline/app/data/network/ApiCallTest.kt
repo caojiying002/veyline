@@ -1,5 +1,7 @@
 package com.veyline.app.data.network
 
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import com.veyline.app.data.network.exception.EmptyResponseBodyException
 import com.veyline.app.data.network.exception.MissingDataException
 import com.veyline.app.data.network.model.ApiResponse
@@ -10,7 +12,10 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 
@@ -160,25 +165,67 @@ class ApiCallTest {
     /** 验证网络 IO 异常被转换为 [ApiResult.Failure.Network]。 */
     @Test
     fun `apiCall throwing IOException returns Network failure`() = runTest {
+        val exception = IOException("network failed")
+
+        val result = apiCall<String> {
+            throw exception
+        }
+
+        assertIs<ApiResult.Failure.Network>(result)
+        assertSame(exception, result.exception)
     }
 
     /** 验证 JSON 数据与声明类型不匹配时返回 [ApiResult.Failure.Serialization]。 */
     @Test
     fun `apiCall throwing JsonDataException returns Serialization failure`() = runTest {
+        val exception = JsonDataException("JSON data does not match the declared type")
+
+        val result = apiCall<String> {
+            throw exception
+        }
+
+        assertIs<ApiResult.Failure.Serialization>(result)
+        assertSame(exception, result.exception)
     }
 
     /** 验证 JSON 编码格式非法时返回 [ApiResult.Failure.Serialization]。 */
     @Test
     fun `apiCall throwing JsonEncodingException returns Serialization failure`() = runTest {
+        val exception = JsonEncodingException("Malformed JSON")
+
+        val result = apiCall<String> {
+            throw exception
+        }
+
+        assertIs<ApiResult.Failure.Serialization>(result)
+        assertSame(exception, result.exception)
     }
 
     /** 验证协程取消不会被转换为普通请求失败。 */
     @Test
     fun `apiCall throwing CancellationException rethrows exception`() = runTest {
+        val exception = CancellationException("request cancelled")
+
+        val thrown = assertFailsWith<CancellationException> {
+            apiCall<String> {
+                throw exception
+            }
+        }
+
+        assertSame(exception, thrown)
     }
 
     /** 验证未预期的程序异常不会被网络层吞掉或降级。 */
     @Test
     fun `apiCall throwing unexpected exception rethrows exception`() = runTest {
+        val exception = IllegalStateException("unexpected application error")
+
+        val thrown = assertFailsWith<IllegalStateException> {
+            apiCall<String> {
+                throw exception
+            }
+        }
+
+        assertSame(exception, thrown)
     }
 }
