@@ -6,11 +6,12 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.veyline.app.data.network.model.ApiResponse
 import com.veyline.app.data.network.model.NoData
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertThrows
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertSame
 
 /**
  * 验证 [ApiResponseJsonAdapterFactory] 对 [ApiResponse] 及其多态 `data` 字段的解析契约。
@@ -49,7 +50,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """{"code":0,"msg":"success","data":"value"}""",
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertEquals("value", result.data)
@@ -63,7 +64,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """{"code":0,"msg":"success"}""",
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertNull(result.data)
@@ -77,7 +78,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """{"code":0,"msg":"success"}""",
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertSame(NoData, result.data)
@@ -91,7 +92,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """{"data":"value","msg":"success","code":0}""",
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertEquals("value", result.data)
@@ -114,7 +115,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """.trimIndent(),
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_VALIDATION_ERROR, result.code)
         assertEquals("validation failed", result.msg)
         assertNull(result.data)
@@ -140,7 +141,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """.trimIndent(),
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_VALIDATION_ERROR, result.code)
         assertEquals("validation failed", result.msg)
         assertNull(result.data)
@@ -162,7 +163,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """.trimIndent(),
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_VALIDATION_ERROR, result.code)
         assertEquals("validation failed", result.msg)
         assertNull(result.data)
@@ -187,7 +188,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """.trimIndent(),
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(1000, result.code)
         assertEquals("business failed", result.msg)
         assertNull(result.data)
@@ -197,7 +198,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证缺少必需的 `code` 字段时解析失败。 */
     @Test
     fun `fromJson without code throws JsonDataException`() {
-        assertThrows(JsonDataException::class.java) {
+        assertFailsWith<JsonDataException> {
             stringAdapter.fromJson(
                 """{"msg":"failed","data":null}""",
             )
@@ -207,7 +208,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证必需的 `code` 显式为 JSON `null` 时解析失败。 */
     @Test
     fun `fromJson with null code throws JsonDataException`() {
-        assertThrows(JsonDataException::class.java) {
+        assertFailsWith<JsonDataException> {
             stringAdapter.fromJson(
                 """{"code":null,"msg":"failed","data":null}""",
             )
@@ -217,7 +218,7 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证 `code` 不是整数类型时解析失败。 */
     @Test
     fun `fromJson with invalid code type throws JsonDataException`() {
-        assertThrows(JsonDataException::class.java) {
+        assertFailsWith<JsonDataException> {
             stringAdapter.fromJson(
                 """{"code":true,"msg":"failed","data":null}""",
             )
@@ -240,7 +241,7 @@ class ApiResponseJsonAdapterFactoryTest {
             """.trimIndent(),
         )
 
-        requireNotNull(result)
+        assertNotNull(result)
         assertEquals(ApiResponse.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertEquals("value", result.data)

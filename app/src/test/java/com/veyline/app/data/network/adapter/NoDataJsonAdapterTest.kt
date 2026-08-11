@@ -2,8 +2,8 @@ package com.veyline.app.data.network.adapter
 
 import com.squareup.moshi.Moshi
 import com.veyline.app.data.network.model.NoData
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import org.junit.Test
 
 /**

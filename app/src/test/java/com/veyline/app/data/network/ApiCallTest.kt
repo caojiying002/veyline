@@ -7,12 +7,12 @@ import com.veyline.app.data.network.model.ApiResult
 import com.veyline.app.data.network.model.NoData
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertSame
 
 class ApiCallTest {
 
@@ -95,10 +95,8 @@ class ApiCallTest {
             )
         }
 
-        assertTrue(result is ApiResult.Failure.Serialization)
-
-        val exception = (result as ApiResult.Failure.Serialization).exception
-        assertTrue(exception is MissingDataException)
+        assertIs<ApiResult.Failure.Serialization>(result)
+        assertIs<MissingDataException>(result.exception)
     }
 
     /** 验证成功的 HTTP 响应不包含响应体时返回 [ApiResult.Failure.Serialization]。 */
@@ -108,10 +106,8 @@ class ApiCallTest {
             Response.success<ApiResponse<String>>(null)
         }
 
-        assertTrue(result is ApiResult.Failure.Serialization)
-
-        val exception = (result as ApiResult.Failure.Serialization).exception
-        assertTrue(exception is EmptyResponseBodyException)
+        assertIs<ApiResult.Failure.Serialization>(result)
+        assertIs<EmptyResponseBodyException>(result.exception)
     }
 
     /** 验证无响应体调用在 HTTP 成功时返回包含 [NoData] 的成功结果。 */
@@ -156,11 +152,9 @@ class ApiCallTest {
             throw exception
         }
 
-        assertTrue(result is ApiResult.Failure.Http)
-
-        val failure = result as ApiResult.Failure.Http
-        assertEquals(500, failure.statusCode)
-        assertSame(exception, failure.exception)
+        assertIs<ApiResult.Failure.Http>(result)
+        assertEquals(500, result.statusCode)
+        assertSame(exception, result.exception)
     }
 
     /** 验证网络 IO 异常被转换为 [ApiResult.Failure.Network]。 */
