@@ -130,4 +130,45 @@ class MerchantRepositoryTest {
 
         assertEquals(expected, result)
     }
+
+    /** 验证成功加载后复用进程内缓存，不重复请求接口。 */
+    @Test
+    fun `getMerchantCities after successful response uses cache`() = runTest {
+        var requestCount = 0
+        val apiService = object : MerchantApiService {
+            override suspend fun getMerchantCities():
+                    Response<ApiResponse<List<MerchantCityDto>>> {
+                requestCount++
+
+                return Response.success(
+                    ApiResponse(
+                        code = ApiResponse.CODE_SUCCESS,
+                        msg = "success",
+                        data = listOf(
+                            MerchantCityDto(
+                                code = "code-a",
+                                name = "城市甲",
+                            ),
+                        ),
+                    ),
+                )
+            }
+        }
+        val repository = MerchantRepository(apiService)
+        val expected = ApiResult.Success(
+            listOf(
+                MerchantCity(
+                    code = "code-a",
+                    name = "城市甲",
+                ),
+            ),
+        )
+
+        val firstResult = repository.getMerchantCities()
+        val secondResult = repository.getMerchantCities()
+
+        assertEquals(expected, firstResult)
+        assertEquals(expected, secondResult)
+        assertEquals(1, requestCount)
+    }
 }
