@@ -1,8 +1,10 @@
 package com.veyline.app.feature.merchant.data.mapper
 
+import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
 import com.veyline.app.feature.merchant.domain.model.MerchantCity
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import org.junit.Test
 
 /**
@@ -63,25 +65,86 @@ class MerchantCityMapperTest {
     /** 验证城市 code 缺失时抛出数据无效异常。 */
     @Test
     fun `toDomainModels with null code throws invalid data exception`() {
+        val cityDtos = listOf(
+            MerchantCityDto(code = null, name = "城市甲"),
+        )
+
+        val exception = assertFailsWith<InvalidApiDataException> {
+            cityDtos.toDomainModels()
+        }
+
+        assertEquals(
+            "Merchant city at index 0 has a missing or blank code",
+            exception.message,
+        )
     }
 
     /** 验证城市 code 只有空白字符时抛出数据无效异常。 */
     @Test
     fun `toDomainModels with blank code throws invalid data exception`() {
+        val cityDtos = listOf(
+            MerchantCityDto(code = "   ", name = "城市甲"),
+        )
+
+        val exception = assertFailsWith<InvalidApiDataException> {
+            cityDtos.toDomainModels()
+        }
+
+        assertEquals(
+            "Merchant city at index 0 has a missing or blank code",
+            exception.message,
+        )
     }
 
     /** 验证城市 name 缺失时抛出数据无效异常。 */
     @Test
     fun `toDomainModels with null name throws invalid data exception`() {
+        val cityDtos = listOf(
+            MerchantCityDto(code = "code-a", name = null),
+        )
+
+        val exception = assertFailsWith<InvalidApiDataException> {
+            cityDtos.toDomainModels()
+        }
+
+        assertEquals(
+            "Merchant city at index 0 has a missing or blank name",
+            exception.message,
+        )
     }
 
     /** 验证城市 name 只有空白字符时抛出数据无效异常。 */
     @Test
     fun `toDomainModels with blank name throws invalid data exception`() {
+        val cityDtos = listOf(
+            MerchantCityDto(code = "code-a", name = "   "),
+        )
+
+        val exception = assertFailsWith<InvalidApiDataException> {
+            cityDtos.toDomainModels()
+        }
+
+        assertEquals(
+            "Merchant city at index 0 has a missing or blank name",
+            exception.message,
+        )
     }
 
     /** 验证规范化后 code 重复时保留接口中第一次出现的城市。 */
     @Test
     fun `toDomainModels with duplicate codes keeps first city`() {
+        val cityDtos = listOf(
+            MerchantCityDto(code = "code-a", name = "城市甲"),
+            MerchantCityDto(code = "  code-a  ", name = "重复城市"),
+            MerchantCityDto(code = "code-b", name = "城市乙"),
+        )
+        val expected = listOf(
+            MerchantCity(code = "code-a", name = "城市甲"),
+            MerchantCity(code = "code-b", name = "城市乙"),
+        )
+
+        val result = cityDtos.toDomainModels()
+
+        assertEquals(expected, result)
     }
 }
