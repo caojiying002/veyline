@@ -1,7 +1,9 @@
 package com.veyline.app.feature.merchant.data
 
 import com.veyline.app.data.network.apiCall
+import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.feature.merchant.data.mapper.toDomainModels
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
 import com.veyline.app.feature.merchant.domain.model.MerchantCity
@@ -10,7 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 class MerchantRepository @Inject constructor(
-    private val apiService: MerchantApiService
+    private val apiService: MerchantApiService,
 ) {
 
     suspend fun getMerchantCities(): ApiResult<List<MerchantCity>> {
@@ -25,5 +27,9 @@ class MerchantRepository @Inject constructor(
     private fun mapCities(
         cities: List<MerchantCityDto>,
     ): ApiResult<List<MerchantCity>> =
-        TODO("Implement MerchantCity DTO validation and domain mapping")
+        try {
+            ApiResult.Success(cities.toDomainModels())
+        } catch (exception: InvalidApiDataException) {
+            ApiResult.Failure.Serialization(exception)
+        }
 }
