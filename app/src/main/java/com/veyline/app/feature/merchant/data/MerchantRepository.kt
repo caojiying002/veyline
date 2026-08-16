@@ -46,7 +46,8 @@ class MerchantRepository @Inject constructor(
                 is ApiResult.Success -> {
                     val mappedResult = mapCities(result.data)
 
-                    if (mappedResult is ApiResult.Success) {
+                    // 空城市列表不写入缓存，使页面后续加载时能够重新请求并自行恢复。
+                    if (mappedResult is ApiResult.Success && mappedResult.data.isNotEmpty()) {
                         cachedCities = mappedResult.data
                     }
 
