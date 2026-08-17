@@ -1,17 +1,18 @@
 package com.veyline.app.feature.merchant.presentation.city
 
-import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.ApiResult
 import com.veyline.app.feature.merchant.data.MerchantRepository
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
-import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
 import com.veyline.app.feature.merchant.domain.model.MerchantCity
 import com.veyline.app.test.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
-import retrofit2.Response
 import kotlin.test.assertEquals
 
 /**
@@ -28,65 +29,45 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证创建 ViewModel 时只提供初始状态，不会自动请求城市数据。 */
     @Test
-    fun `create ViewModel does not request cities`() {
-        var requestCount = 0
-        val apiService = object : MerchantApiService {
-            override suspend fun getMerchantCities():
-                    Response<ApiResponse<List<MerchantCityDto>>> {
-                requestCount++
-
-                return Response.success(
-                    ApiResponse(
-                        code = ApiResponse.CODE_SUCCESS,
-                        msg = "success",
-                        data = emptyList(),
-                    ),
-                )
-            }
-        }
-        val repository = MerchantRepository(apiService)
-
+    fun `create ViewModel does not request cities`() = runTest {
+        val repository = mockk<MerchantRepository>()
         val viewModel = MerchantCitySelectionViewModel(repository)
 
+        // 推进 testScheduler 直到不再任务待执行，避免“未发起请求”的断言因任务尚未运行而错误通过。
+        advanceUntilIdle()
+
         assertEquals(MerchantCitySelectionUiState(), viewModel.uiState.value)
-        assertEquals(0, requestCount)
+        coVerify(exactly = 0) {
+            repository.getMerchantCities()
+        }
     }
 
     /** 验证首次加载成功后更新城市列表并结束加载状态。 */
     @Test
     fun `InitialLoad with successful response updates cities`() = runTest {
-        val apiService = object : MerchantApiService {
-            override suspend fun getMerchantCities():
-                    Response<ApiResponse<List<MerchantCityDto>>> =
-                Response.success(
-                    ApiResponse(
-                        code = ApiResponse.CODE_SUCCESS,
-                        msg = "success",
-                        data = listOf(
-                            MerchantCityDto(
-                                code = "code-a",
-                                name = "城市甲",
-                            ),
-                        ),
-                    ),
-                )
-        }
-        val repository = MerchantRepository(apiService)
+        val cities = listOf(
+            MerchantCity(
+                code = "code-a",
+                name = "城市甲",
+            ),
+        )
+
+        val repository = mockk<MerchantRepository>()
+
+        // 配置 repository.getMerchantCities() 方法的返回值
+        coEvery {
+            repository.getMerchantCities()
+        } returns ApiResult.Success(cities)
+
         val viewModel = MerchantCitySelectionViewModel(repository)
         val expected = MerchantCitySelectionUiState(
-            cities = listOf(
-                MerchantCity(
-                    code = "code-a",
-                    name = "城市甲",
-                ),
-            ),
+            cities = cities,
             isLoading = false,
             error = null,
         )
 
         viewModel.onAction(MerchantCitySelectionAction.InitialLoad)
-
-        // 执行测试调度器中排队的 viewModelScope 任务，等待城市加载和状态更新全部完成。
+        // 执行 testScheduler 中排队的 viewModelScope 任务，等待城市加载和状态更新全部完成。
         advanceUntilIdle()
 
         assertEquals(expected, viewModel.uiState.value)
