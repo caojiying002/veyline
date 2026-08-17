@@ -1,5 +1,6 @@
 package com.veyline.app.feature.merchant.presentation.city
 
+import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.veyline.app.data.network.model.ApiResult
@@ -55,6 +56,7 @@ class MerchantCitySelectionViewModel @Inject constructor(
     /** 防止城市加载尚未完成时再次发起相同请求。 */
     private var loadCitiesJob: Job? = null
 
+    @MainThread
     fun onAction(action: MerchantCitySelectionAction) {
         when (action) {
             MerchantCitySelectionAction.InitialLoad -> requestInitialLoad()

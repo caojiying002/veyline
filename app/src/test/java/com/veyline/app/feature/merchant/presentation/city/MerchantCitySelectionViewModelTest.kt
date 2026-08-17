@@ -72,4 +72,24 @@ class MerchantCitySelectionViewModelTest {
 
         assertEquals(expected, viewModel.uiState.value)
     }
+
+    /** 验证重复发送首次加载操作时只请求一次城市数据。 */
+    @Test
+    fun `repeated InitialLoad requests cities once`() = runTest {
+        val repository = mockk<MerchantRepository>()
+
+        coEvery {
+            repository.getMerchantCities()
+        } returns ApiResult.Success(emptyList())
+
+        val viewModel = MerchantCitySelectionViewModel(repository)
+
+        viewModel.onAction(MerchantCitySelectionAction.InitialLoad)
+        viewModel.onAction(MerchantCitySelectionAction.InitialLoad)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            repository.getMerchantCities()
+        }
+    }
 }
