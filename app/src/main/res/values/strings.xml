@@ -7,5 +7,12 @@
     <string name="action_exit">@string/action_quit</string>
     <string name="action_retry">重试</string>
 
+    <string name="state_loading">加载中</string>
+
+    <string name="error_connection">网络连接失败，请检查网络后重试</string>
+    <string name="error_technical">出错了，请稍后重试</string>
+
+    <string name="merchant_city_selection_title">请选择地区</string>
+    <string name="merchant_city_empty">暂无城市数据</string>
 
 </resources>
