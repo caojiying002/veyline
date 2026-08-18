@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.dagger.hilt)
 }
 
 // 真实 API 地址由用户级 Gradle Property 或命令行 -P 参数提供，避免写入公开仓库。
@@ -97,8 +97,9 @@ dependencies {
     implementation(libs.squareup.okhttp.logginginterceptor)
 
     // 依赖注入
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    implementation(libs.dagger.hilt.android)
+    ksp(libs.dagger.hilt.compiler)
+    implementation(libs.androidx.hilt)
 
     // 测试依赖
     testImplementation(libs.junit)
