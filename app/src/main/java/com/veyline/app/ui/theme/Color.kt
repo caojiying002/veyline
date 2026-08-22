@@ -51,3 +51,7 @@ internal val ButtonPressedSecondary = Color(0xFFF5F5F5)
 internal val ButtonPressedDark = Color(0xFFFF8CBF)
 internal val ButtonDisabledDark = Color(0xFF3C3C3C)
 internal val ButtonPressedSecondaryDark = Color(0xFF404040)
+
+// Thin Divider Colors
+internal val ThinDivider = Color(0xFFEEEEEE)
+internal val ThinDividerDark = Color(0xFF383838)

@@ -29,6 +29,14 @@ data class VeylineColors(
     val buttonPressed: Color,
     val buttonDisabled: Color,
     val buttonPressedSecondary: Color,
+
+    /**
+     * 简单列表中相邻 Item 之间的细分隔线颜色。
+     *
+     * 目前用于城市选择列表。信息流列表通过页面背景和 Item 间距形成宽分隔线效果，
+     * 不应使用该颜色。
+     */
+    val thinDivider: Color,
 )
 
 internal val lightVeylineColors = VeylineColors(
@@ -52,6 +60,7 @@ internal val lightVeylineColors = VeylineColors(
     buttonPressed = ButtonPressed,
     buttonDisabled = ButtonDisabled,
     buttonPressedSecondary = ButtonPressedSecondary,
+    thinDivider = ThinDivider,
 )
 
 internal val darkVeylineColors = VeylineColors(
@@ -75,6 +84,7 @@ internal val darkVeylineColors = VeylineColors(
     buttonPressed = ButtonPressedDark,
     buttonDisabled = ButtonDisabledDark,
     buttonPressedSecondary = ButtonPressedSecondaryDark,
+    thinDivider = ThinDividerDark,
 )
 
 internal val LocalVeylineColors = staticCompositionLocalOf<VeylineColors> {

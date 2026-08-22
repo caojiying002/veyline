@@ -22,7 +22,19 @@ data class MerchantCitySelectionUiState(
     val cities: List<MerchantCity> = emptyList(),
     val isLoading: Boolean = true,
     val error: UiError? = null,
-)
+) {
+    /** 页面是否已有可供展示的城市内容，等价于 `cities.isNotEmpty()`。 */
+    val hasContent: Boolean
+        get() = cities.isNotEmpty()
+
+    /**
+     * 是否正在无已有内容的情况下加载，等价于 `isLoading && !hasContent`。
+     *
+     * 包括首次请求以及首次加载失败后的重新加载。
+     */
+    val isInitialLoading: Boolean
+        get() = isLoading && !hasContent
+}
 
 /**
  * 商家城市选择页面支持的操作。
