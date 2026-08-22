@@ -121,6 +121,10 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
+    // 下拉刷新
+    implementation(libs.ultraswiperefresh)
+    implementation(libs.ultraswiperefresh.classic)
+
     // 测试依赖
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test.junit)
