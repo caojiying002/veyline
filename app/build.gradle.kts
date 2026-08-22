@@ -12,12 +12,23 @@ plugins {
 val apiBaseUrl = providers.gradleProperty("VEYLINE_API_BASE_URL")
     .orElse("https://example.invalid/")
     .get()
-
 require(apiBaseUrl.startsWith("https://")) {
     "VEYLINE_API_BASE_URL must use HTTPS"
 }
 require(apiBaseUrl.endsWith('/')) {
     "VEYLINE_API_BASE_URL must end with '/'"
+}
+
+// 真实 API User-Agent 可由用户级 Gradle Property 或命令行 -P 参数覆盖。
+// 未配置时使用公开的应用标识，不包含私有服务端的兼容性信息。
+val apiUserAgent = providers.gradleProperty("VEYLINE_API_USER_AGENT")
+    .orElse("Veyline/1.0 (Android)")
+    .get()
+require(apiUserAgent.isNotBlank()) {
+    "VEYLINE_API_USER_AGENT must not be blank"
+}
+require('\r' !in apiUserAgent && '\n' !in apiUserAgent) {
+    "VEYLINE_API_USER_AGENT must not contain line breaks"
 }
 
 android {
@@ -42,6 +53,11 @@ android {
             "String",
             "API_BASE_URL",
             "\"$apiBaseUrl\"",
+        )
+        buildConfigField(
+            type = "String",
+            name = "API_USER_AGENT",
+            value = "\"$apiUserAgent\"",
         )
     }
 

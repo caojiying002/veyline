@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import com.veyline.app.BuildConfig
 import com.veyline.app.data.network.adapter.ApiResponseJsonAdapterFactory
 import com.veyline.app.data.network.adapter.NoDataJsonAdapter
+import com.veyline.app.data.network.interceptor.UserAgentInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,6 +32,9 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient =
         OkHttpClient.Builder()
+            .addInterceptor(
+                UserAgentInterceptor(BuildConfig.API_USER_AGENT)
+            )
             .apply {
                 if (BuildConfig.DEBUG) {
                     addInterceptor(
