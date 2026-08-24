@@ -6,6 +6,8 @@ import com.veyline.app.data.network.apiCall
 import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.model.ApiResult
 import com.veyline.app.data.network.model.PagedDataDto
+import com.veyline.app.data.paging.FIRST_PAGE
+import com.veyline.app.data.paging.PagingFailureException
 import com.veyline.app.feature.merchant.data.mapper.toDomainModels
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
@@ -32,9 +34,11 @@ class MerchantPagingSource(
         return when (result) {
             is ApiResult.Success -> createLoadResult(
                 requestedPage = requestedPage,
-                pagedDataDto = result.data
+                pagedDataDto = result.data,
             )
-            is ApiResult.Failure -> TODO("将结构化失败适配为 LoadResult.Error")
+            is ApiResult.Failure -> LoadResult.Error(
+                throwable = PagingFailureException(result),
+            )
         }
     }
 
@@ -68,15 +72,10 @@ class MerchantPagingSource(
             return LoadResult.Page(
                 data = merchantSummaries,
                 prevKey = null,
-                nextKey = if (current >= pages) null else current + 1
+                nextKey = if (current >= pages) null else current + 1,
             )
         } catch (exception: InvalidApiDataException) {
             return LoadResult.Error(exception)
         }
-    }
-
-    private companion object {
-        // TODO 后续抽取为项目页码分页协议的公共常量
-        const val FIRST_PAGE = 1
     }
 }
