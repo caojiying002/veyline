@@ -83,6 +83,7 @@ class MerchantPagingSource(
         pagedDataDto: PagedDataDto<MerchantSummaryDto>,
     ): LoadResult<Int, MerchantSummary> {
         try {
+            // total 和 size 不参与下一页计算，当前分页逻辑只要求以下三个字段有效
             val records = pagedDataDto.records
             val current = pagedDataDto.current
             val pages = pagedDataDto.pages
