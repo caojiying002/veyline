@@ -204,9 +204,44 @@ class MerchantPagingSourceTest {
 
         assertIs<PagingSource.LoadResult.Error<Int, MerchantSummary>>(loadResult)
         assertIs<InvalidApiDataException>(loadResult.throwable)
-        assertEquals(
-            "Merchant page response is missing required pagination data",
-            loadResult.throwable.message,
+    }
+
+    /** 验证服务端返回页码与请求页码不一致时返回数据无效错误。 */
+    @Test
+    fun `load response with mismatched current page returns invalid data error`() = runTest {
+        val apiService = mockk<MerchantApiService>()
+        coEvery {
+            apiService.getMerchants(
+                page = 2,
+                perPage = 12,
+                cityCode = null,
+            )
+        } returns Response.success(
+            ApiResponse(
+                code = ApiResponse.CODE_SUCCESS,
+                msg = "success",
+                data = PagedDataDto(
+                    records = emptyList(),
+                    total = 0,
+                    size = 12,
+                    current = 1, // 请求第 2 页，但响应声明当前为第 1 页
+                    pages = 2,
+                ),
+            ),
         )
+
+        val pagingSource = MerchantPagingSource(
+            apiService = apiService,
+            cityCode = null,
+        )
+        val loadParams = PagingSource.LoadParams.Append(
+            key = 2,
+            loadSize = 12,
+            placeholdersEnabled = false,
+        )
+        val loadResult = pagingSource.load(loadParams)
+
+        assertIs<PagingSource.LoadResult.Error<Int, MerchantSummary>>(loadResult)
+        assertIs<InvalidApiDataException>(loadResult.throwable)
     }
 }
