@@ -11,6 +11,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
@@ -209,5 +210,12 @@ class MerchantCitySelectionViewModelTest {
         coVerify(exactly = 2) {
             repository.getMerchantCities()
         }
+    }
+
+    /** 验证城市加载尚未完成时发送重试，不会发起并发请求。 */
+    @Ignore("待补充加载期间重试的并发请求测试")
+    @Test
+    fun `Retry while loading requests cities once`() = runTest {
+
     }
 }

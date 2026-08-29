@@ -10,6 +10,7 @@ import com.veyline.app.feature.merchant.domain.model.MerchantSummary
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import org.junit.Ignore
 import org.junit.Test
 import retrofit2.Response
 import kotlin.test.assertEquals
@@ -243,5 +244,29 @@ class MerchantPagingSourceTest {
 
         assertIs<PagingSource.LoadResult.Error<Int, MerchantSummary>>(loadResult)
         assertIs<InvalidApiDataException>(loadResult.throwable)
+    }
+
+    /** 验证业务失败被包装为保留原始失败分类的 Paging 加载错误。 */
+    @Ignore("待补充 PagingFailureException 业务失败测试")
+    @Test
+    fun `load with business failure returns paging failure error`() {
+    }
+
+    /** 验证网络失败被包装为 Paging 加载错误，并保留原始异常原因。 */
+    @Ignore("待补充 PagingFailureException 网络失败测试")
+    @Test
+    fun `load with network failure returns paging failure error with cause`() {
+    }
+
+    /** 验证同一页包含重复商家 ID 时只保留第一次出现的数据。 */
+    @Ignore("待补充页内重复 ID 测试")
+    @Test
+    fun `load page with duplicate merchant ids keeps first occurrence`() {
+    }
+
+    /** 验证后续页包含已加载商家 ID 时只保留第一次出现的数据。 */
+    @Ignore("待补充跨页重复 ID 测试")
+    @Test
+    fun `load next page with duplicate merchant ids keeps first occurrence`() {
     }
 }
