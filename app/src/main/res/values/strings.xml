@@ -14,5 +14,7 @@
 
     <string name="merchant_city_selection_title">请选择地区</string>
     <string name="merchant_city_empty">暂无城市数据</string>
+    <string name="merchant_label">商家</string>
+    <string name="merchant_cover_content_description">%1$s的封面图片</string>
 
 </resources>

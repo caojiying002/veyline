@@ -29,6 +29,13 @@ object VeylineTextStyles {
         fontWeight = FontWeight.Normal,
     ).withLineHeightFix()
 
+    /** 列表项标题等次级标题文本，字号 16sp，行高 20sp。 */
+    val ItemTitle = TextStyle(
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        fontWeight = FontWeight.Normal,
+    ).withLineHeightFix()
+
     /** 正文、描述等常规文本，字号 14sp，行高 18sp。 */
     val Body = TextStyle(
         fontSize = 14.sp,
