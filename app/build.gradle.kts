@@ -112,6 +112,11 @@ dependencies {
     implementation(libs.squareup.okhttp)
     implementation(libs.squareup.okhttp.logginginterceptor)
 
+    // 图片加载
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.view)
+
     // 依赖注入
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
