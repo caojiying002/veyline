@@ -31,6 +31,18 @@ require('\r' !in apiUserAgent && '\n' !in apiUserAgent) {
     "VEYLINE_API_USER_AGENT must not contain line breaks"
 }
 
+// 真实图片地址由用户级 Gradle Property 或命令行 -P 参数提供，避免写入公开仓库。
+// 未配置时使用保留的无效域名，使公开项目仍可正常编译和展示图片失败占位图。
+val imageBaseUrl = providers.gradleProperty("VEYLINE_IMAGE_BASE_URL")
+    .orElse("https://example.invalid/images/")
+    .get()
+require(imageBaseUrl.startsWith("https://")) {
+    "VEYLINE_IMAGE_BASE_URL must use HTTPS"
+}
+require(imageBaseUrl.endsWith('/')) {
+    "VEYLINE_IMAGE_BASE_URL must end with '/'"
+}
+
 android {
     namespace = "com.veyline.app"
     compileSdk {
@@ -48,7 +60,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // 将构建时解析的地址写入 AGP 生成的 BuildConfig，供网络层统一读取。
+        // 将构建时解析的配置写入 AGP 生成的 BuildConfig，供运行时代码统一读取。
         buildConfigField(
             "String",
             "API_BASE_URL",
@@ -58,6 +70,11 @@ android {
             type = "String",
             name = "API_USER_AGENT",
             value = "\"$apiUserAgent\"",
+        )
+        buildConfigField(
+            type = "String",
+            name = "IMAGE_BASE_URL",
+            value = "\"$imageBaseUrl\"",
         )
     }
 
