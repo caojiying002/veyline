@@ -62,74 +62,6 @@ class MerchantCityMapperTest {
         assertEquals(emptyList(), result)
     }
 
-    /** 验证城市 code 缺失时抛出数据无效异常。 */
-    @Test
-    fun `toDomainModels with null code throws invalid data exception`() {
-        val cityDtos = listOf(
-            MerchantCityDto(code = null, name = "城市甲"),
-        )
-
-        val exception = assertFailsWith<InvalidApiDataException> {
-            cityDtos.toDomainModels()
-        }
-
-        assertEquals(
-            "Merchant city at index 0 has a missing or blank code",
-            exception.message,
-        )
-    }
-
-    /** 验证城市 code 只有空白字符时抛出数据无效异常。 */
-    @Test
-    fun `toDomainModels with blank code throws invalid data exception`() {
-        val cityDtos = listOf(
-            MerchantCityDto(code = "   ", name = "城市甲"),
-        )
-
-        val exception = assertFailsWith<InvalidApiDataException> {
-            cityDtos.toDomainModels()
-        }
-
-        assertEquals(
-            "Merchant city at index 0 has a missing or blank code",
-            exception.message,
-        )
-    }
-
-    /** 验证城市 name 缺失时抛出数据无效异常。 */
-    @Test
-    fun `toDomainModels with null name throws invalid data exception`() {
-        val cityDtos = listOf(
-            MerchantCityDto(code = "code-a", name = null),
-        )
-
-        val exception = assertFailsWith<InvalidApiDataException> {
-            cityDtos.toDomainModels()
-        }
-
-        assertEquals(
-            "Merchant city at index 0 has a missing or blank name",
-            exception.message,
-        )
-    }
-
-    /** 验证城市 name 只有空白字符时抛出数据无效异常。 */
-    @Test
-    fun `toDomainModels with blank name throws invalid data exception`() {
-        val cityDtos = listOf(
-            MerchantCityDto(code = "code-a", name = "   "),
-        )
-
-        val exception = assertFailsWith<InvalidApiDataException> {
-            cityDtos.toDomainModels()
-        }
-
-        assertEquals(
-            "Merchant city at index 0 has a missing or blank name",
-            exception.message,
-        )
-    }
-
     /** 验证规范化后 code 重复时保留接口中第一次出现的城市。 */
     @Test
     fun `toDomainModels with duplicate codes keeps first city`() {
@@ -146,5 +78,53 @@ class MerchantCityMapperTest {
         val result = cityDtos.toDomainModels()
 
         assertEquals(expected, result)
+    }
+
+    /** 验证非法城市会被忽略，且不会影响其他合法城市的转换。 */
+    @Test
+    fun `toDomainModels with invalid cities ignores them`() {
+        val cityDtos = listOf(
+            MerchantCityDto(code = "code-a", name = "城市甲"),
+            MerchantCityDto(code = null, name = "缺少代码"),
+            MerchantCityDto(code = "   ", name = "代码为空"),
+            MerchantCityDto(code = "code-b", name = null),
+            MerchantCityDto(code = "code-c", name = "   "),
+            MerchantCityDto(code = "code-b", name = "城市乙"),
+        )
+        val expected = listOf(
+            MerchantCity(code = "code-a", name = "城市甲"),
+            MerchantCity(code = "code-b", name = "城市乙"),
+        )
+
+        val result = cityDtos.toDomainModels()
+
+        assertEquals(expected, result)
+    }
+
+    /** 验证非空输入中没有任何有效城市时抛出数据无效异常。 */
+    @Test
+    fun `toDomainModels with no valid cities throws invalid data exception`() {
+        val cityDtos = listOf(
+            MerchantCityDto(
+                code = null,
+                name = "城市甲",
+            ),
+            MerchantCityDto(
+                code = "   ",
+                name = "城市乙",
+            ),
+            MerchantCityDto(
+                code = "code-c",
+                name = null,
+            ),
+            MerchantCityDto(
+                code = "code-d",
+                name = "   ",
+            ),
+        )
+
+        assertFailsWith<InvalidApiDataException> {
+            cityDtos.toDomainModels()
+        }
     }
 }
