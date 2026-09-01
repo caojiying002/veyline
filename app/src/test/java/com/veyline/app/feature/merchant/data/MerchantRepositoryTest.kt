@@ -1,10 +1,12 @@
 package com.veyline.app.feature.merchant.data
 
 import androidx.paging.testing.asSnapshot
+import com.veyline.app.data.image.ImageUrlResolver
 import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.model.ApiResponse
 import com.veyline.app.data.network.model.ApiResult
 import com.veyline.app.data.network.model.PagedDataDto
+import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
@@ -30,6 +32,10 @@ import kotlin.test.assertIs
  * PagingSource 内部的具体字段校验、分页键计算与去重规则由各自的独立测试覆盖。
  */
 class MerchantRepositoryTest {
+
+    private val merchantSummaryMapper = MerchantSummaryMapper(
+        imageUrlResolver = ImageUrlResolver(TEST_IMAGE_BASE_URL),
+    )
 
     /** 验证商家分页首次加载使用固定页大小，并规范化城市筛选代码。 */
     @Test
@@ -62,8 +68,8 @@ class MerchantRepositoryTest {
                 ),
             ),
         )
+        val repository = createRepository(apiService)
 
-        val repository = MerchantRepository(apiService)
         val merchants = repository
             .getMerchants(cityCode = "  city-a  ") // 验证 Repository 会清理城市代码两侧的空白
             .asSnapshot() // 收集 PagingData 当前加载结果，并转换为便于断言的普通 List
@@ -74,7 +80,7 @@ class MerchantRepositoryTest {
                 name = "商家甲",
                 cityCode = "city-a",
                 intro = "商家简介",
-                coverImagePath = null,
+                coverImageUrl = null,
             ),
         )
         assertEquals(expected, merchants)
@@ -98,7 +104,7 @@ class MerchantRepositoryTest {
                 ),
             ),
         )
-        val repository = MerchantRepository(apiService)
+        val repository = createRepository(apiService)
 
         val expected = ApiResult.Success(
             listOf(
@@ -131,7 +137,7 @@ class MerchantRepositoryTest {
                 data = emptyList(),
             ),
         )
-        val repository = MerchantRepository(apiService)
+        val repository = createRepository(apiService)
 
         val expected = ApiResult.Success(emptyList<MerchantCity>())
         val firstResult = repository.getMerchantCities()
@@ -166,7 +172,7 @@ class MerchantRepositoryTest {
                 ),
             ),
         )
-        val repository = MerchantRepository(apiService)
+        val repository = createRepository(apiService)
 
         val firstResult = repository.getMerchantCities()
         val secondResult = repository.getMerchantCities()
@@ -196,7 +202,7 @@ class MerchantRepositoryTest {
                 data = null,
             ),
         )
-        val repository = MerchantRepository(apiService)
+        val repository = createRepository(apiService)
 
         val expected = ApiResult.Failure.Business(
             code = 1000,
@@ -236,7 +242,7 @@ class MerchantRepositoryTest {
             delay(100)
             response
         }
-        val repository = MerchantRepository(apiService)
+        val repository = createRepository(apiService)
 
         val expected = ApiResult.Success(
             listOf(
@@ -255,5 +261,17 @@ class MerchantRepositoryTest {
         coVerify(exactly = 1) {
             apiService.getMerchantCities()
         }
+    }
+
+    private fun createRepository(
+        apiService: MerchantApiService,
+    ): MerchantRepository =
+        MerchantRepository(
+            apiService = apiService,
+            merchantSummaryMapper = merchantSummaryMapper,
+        )
+
+    private companion object {
+        const val TEST_IMAGE_BASE_URL = "https://example.test/images/"
     }
 }

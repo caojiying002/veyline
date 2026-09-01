@@ -6,7 +6,8 @@ import androidx.paging.PagingData
 import com.veyline.app.data.network.apiCall
 import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.model.ApiResult
-import com.veyline.app.feature.merchant.data.mapper.toDomainModels
+import com.veyline.app.feature.merchant.data.mapper.MerchantCityMapper
+import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.paging.MerchantPagingSource
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
@@ -31,6 +32,7 @@ import javax.inject.Singleton
 @Singleton
 class MerchantRepository @Inject constructor(
     private val apiService: MerchantApiService,
+    private val merchantSummaryMapper: MerchantSummaryMapper,
 ) {
 
     /** 同步缓存访问，并避免多个首次调用同时发起相同的城市列表请求。 */
@@ -56,7 +58,7 @@ class MerchantRepository @Inject constructor(
     fun getMerchants(
         cityCode: String?,
     ): Flow<PagingData<MerchantSummary>> {
-        val normalizedCityCode = cityCode
+        val apiCityCode = cityCode
             ?.trim()
             ?.takeIf { it.isNotEmpty() }
 
@@ -70,7 +72,8 @@ class MerchantRepository @Inject constructor(
             pagingSourceFactory = {
                 MerchantPagingSource(
                     apiService = apiService,
-                    cityCode = normalizedCityCode,
+                    merchantSummaryMapper = merchantSummaryMapper,
+                    cityCode = apiCityCode,
                 )
             },
         ).flow
@@ -109,7 +112,7 @@ class MerchantRepository @Inject constructor(
         cities: List<MerchantCityDto>,
     ): ApiResult<List<MerchantCity>> =
         try {
-            ApiResult.Success(cities.toDomainModels())
+            ApiResult.Success(MerchantCityMapper.map(cities))
         } catch (exception: InvalidApiDataException) {
             ApiResult.Failure.Serialization(exception)
         }

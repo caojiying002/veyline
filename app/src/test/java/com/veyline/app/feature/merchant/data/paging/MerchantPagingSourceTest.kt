@@ -1,9 +1,11 @@
 package com.veyline.app.feature.merchant.data.paging
 
 import androidx.paging.PagingSource
+import com.veyline.app.data.image.ImageUrlResolver
 import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.model.ApiResponse
 import com.veyline.app.data.network.model.PagedDataDto
+import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
@@ -18,6 +20,10 @@ import kotlin.test.assertIs
 
 class MerchantPagingSourceTest {
 
+    private val merchantSummaryMapper = MerchantSummaryMapper(
+        imageUrlResolver = ImageUrlResolver(TEST_IMAGE_BASE_URL),
+    )
+
     /** 验证首次加载成功时返回映射后的商家数据和下一页页码。 */
     @Test
     fun `load first page returns merchants and next page key`() = runTest {
@@ -27,7 +33,7 @@ class MerchantPagingSourceTest {
             name = "商家甲",
             cityCode = cityCode,
             intro = "商家简介",
-            coverPicture = "images/merchant-a.jpg",
+            coverPicture = "merchant-a.jpg",
         )
 
         val apiService = mockk<MerchantApiService>()
@@ -52,7 +58,7 @@ class MerchantPagingSourceTest {
             ),
         )
 
-        val pagingSource = MerchantPagingSource(
+        val pagingSource = createPagingSource(
             apiService = apiService,
             cityCode = cityCode,
         )
@@ -70,7 +76,7 @@ class MerchantPagingSourceTest {
             name = "商家甲",
             cityCode = cityCode,
             intro = "商家简介",
-            coverImagePath = "images/merchant-a.jpg",
+            coverImageUrl = "https://example.test/images/merchant-a.jpg",
         )
         assertEquals(listOf(expectedMerchantSummary), loadResult.data)
         assertEquals(null, loadResult.prevKey)
@@ -110,7 +116,7 @@ class MerchantPagingSourceTest {
             ),
         )
 
-        val pagingSource = MerchantPagingSource(
+        val pagingSource = createPagingSource(
             apiService = apiService,
             cityCode = cityCode,
         )
@@ -151,7 +157,7 @@ class MerchantPagingSourceTest {
             ),
         )
 
-        val pagingSource = MerchantPagingSource(
+        val pagingSource = createPagingSource(
             apiService = apiService,
             cityCode = null,
         )
@@ -192,7 +198,7 @@ class MerchantPagingSourceTest {
             ),
         )
 
-        val pagingSource = MerchantPagingSource(
+        val pagingSource = createPagingSource(
             apiService = apiService,
             cityCode = null,
         )
@@ -231,7 +237,7 @@ class MerchantPagingSourceTest {
             ),
         )
 
-        val pagingSource = MerchantPagingSource(
+        val pagingSource = createPagingSource(
             apiService = apiService,
             cityCode = null,
         )
@@ -268,5 +274,19 @@ class MerchantPagingSourceTest {
     @Ignore("待补充跨页重复 ID 测试")
     @Test
     fun `load next page with duplicate merchant ids keeps first occurrence`() {
+    }
+
+    private fun createPagingSource(
+        apiService: MerchantApiService,
+        cityCode: String? = null,
+    ): MerchantPagingSource =
+        MerchantPagingSource(
+            apiService = apiService,
+            merchantSummaryMapper = merchantSummaryMapper,
+            cityCode = cityCode,
+        )
+
+    private companion object {
+        const val TEST_IMAGE_BASE_URL = "https://example.test/images/"
     }
 }

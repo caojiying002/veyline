@@ -8,7 +8,7 @@ import com.veyline.app.data.network.model.ApiResult
 import com.veyline.app.data.network.model.PagedDataDto
 import com.veyline.app.data.paging.FIRST_PAGE
 import com.veyline.app.data.paging.PagingFailureException
-import com.veyline.app.feature.merchant.data.mapper.toDomainModels
+import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
@@ -30,6 +30,7 @@ import java.util.logging.Logger
  */
 class MerchantPagingSource(
     private val apiService: MerchantApiService,
+    private val merchantSummaryMapper: MerchantSummaryMapper,
     private val cityCode: String?,
 ) : PagingSource<Int, MerchantSummary>() {
 
@@ -101,7 +102,7 @@ class MerchantPagingSource(
                 )
             }
 
-            val merchants = records.toDomainModels()
+            val merchants = merchantSummaryMapper.map(records)
             val deduplicatedMerchants = merchants.filter { merchant ->
                 loadedMerchantIds.add(merchant.id)
             }

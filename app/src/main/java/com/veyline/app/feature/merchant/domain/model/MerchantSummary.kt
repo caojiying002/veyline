@@ -18,5 +18,5 @@ data class MerchantSummary(
     val name: String,
     val cityCode: String,
     val intro: String,
-    val coverImagePath: String?,
+    val coverImageUrl: String?,
 )

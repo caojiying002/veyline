@@ -26,7 +26,7 @@ class MerchantCityMapperTest {
             MerchantCity(code = "code-b", name = "城市乙"),
         )
 
-        val result = cityDtos.toDomainModels()
+        val result = MerchantCityMapper.map(cityDtos)
 
         assertEquals(expected, result)
     }
@@ -47,7 +47,7 @@ class MerchantCityMapperTest {
             ),
         )
 
-        val result = cityDtos.toDomainModels()
+        val result = MerchantCityMapper.map(cityDtos)
 
         assertEquals(expected, result)
     }
@@ -57,7 +57,7 @@ class MerchantCityMapperTest {
     fun `toDomainModels with empty list returns empty list`() {
         val cityDtos = emptyList<MerchantCityDto>()
 
-        val result = cityDtos.toDomainModels()
+        val result = MerchantCityMapper.map(cityDtos)
 
         assertEquals(emptyList(), result)
     }
@@ -75,7 +75,7 @@ class MerchantCityMapperTest {
             MerchantCity(code = "code-b", name = "城市乙"),
         )
 
-        val result = cityDtos.toDomainModels()
+        val result = MerchantCityMapper.map(cityDtos)
 
         assertEquals(expected, result)
     }
@@ -96,7 +96,7 @@ class MerchantCityMapperTest {
             MerchantCity(code = "code-b", name = "城市乙"),
         )
 
-        val result = cityDtos.toDomainModels()
+        val result = MerchantCityMapper.map(cityDtos)
 
         assertEquals(expected, result)
     }
@@ -124,7 +124,7 @@ class MerchantCityMapperTest {
         )
 
         assertFailsWith<InvalidApiDataException> {
-            cityDtos.toDomainModels()
+            MerchantCityMapper.map(cityDtos)
         }
     }
 }

@@ -76,11 +76,11 @@ fun MerchantListItem(
             )
 
             //
-            merchant.coverImagePath?.let { coverImagePath ->
+            merchant.coverImageUrl?.let { imageUrl ->
                 Spacer(modifier = Modifier.width(SpacingMedium))
 
                 MerchantCover(
-                    imageModel = coverImagePath,
+                    imageModel = imageUrl,
                     merchantName = merchant.name,
                 )
             }
