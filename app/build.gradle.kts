@@ -43,6 +43,30 @@ require(imageBaseUrl.endsWith('/')) {
     "VEYLINE_IMAGE_BASE_URL must end with '/'"
 }
 
+// 真实图片 User-Agent 可由用户级 Gradle Property 或命令行 -P 参数覆盖。
+// 未配置时使用公开的应用标识，不包含私有图片服务的兼容性信息。
+val imageUserAgent = providers.gradleProperty("VEYLINE_IMAGE_USER_AGENT")
+    .orElse("Veyline/1.0 (Android)")
+    .get()
+require(imageUserAgent.isNotBlank()) {
+    "VEYLINE_IMAGE_USER_AGENT must not be blank"
+}
+require('\r' !in imageUserAgent && '\n' !in imageUserAgent) {
+    "VEYLINE_IMAGE_USER_AGENT must not contain line breaks"
+}
+
+// 真实图片 Referer 可由用户级 Gradle Property 或命令行 -P 参数覆盖。
+// 未配置时使用公开占位地址，不暴露私有图片服务的来源校验信息。
+val imageReferer = providers.gradleProperty("VEYLINE_IMAGE_REFERER")
+    .orElse("https://example.invalid/")
+    .get()
+require(imageReferer.startsWith("https://")) {
+    "VEYLINE_IMAGE_REFERER must use HTTPS"
+}
+require('\r' !in imageReferer && '\n' !in imageReferer) {
+    "VEYLINE_IMAGE_REFERER must not contain line breaks"
+}
+
 android {
     namespace = "com.veyline.app"
     compileSdk {
@@ -75,6 +99,16 @@ android {
             type = "String",
             name = "IMAGE_BASE_URL",
             value = "\"$imageBaseUrl\"",
+        )
+        buildConfigField(
+            type = "String",
+            name = "IMAGE_USER_AGENT",
+            value = "\"$imageUserAgent\"",
+        )
+        buildConfigField(
+            type = "String",
+            name = "IMAGE_REFERER",
+            value = "\"$imageReferer\"",
         )
     }
 
