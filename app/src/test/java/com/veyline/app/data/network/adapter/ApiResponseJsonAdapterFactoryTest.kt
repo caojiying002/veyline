@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.NoData
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -30,17 +30,17 @@ class ApiResponseJsonAdapterFactoryTest {
         .build()
 
     private val stringResponseType = Types.newParameterizedType(
-        ApiResponse::class.java,
+        ApiResponseDto::class.java,
         String::class.java,
     )
-    private val stringAdapter: JsonAdapter<ApiResponse<String>> =
+    private val stringAdapter: JsonAdapter<ApiResponseDto<String>> =
         moshi.adapter(stringResponseType)
 
     private val noDataResponseType = Types.newParameterizedType(
-        ApiResponse::class.java,
+        ApiResponseDto::class.java,
         NoData::class.java,
     )
-    private val noDataAdapter: JsonAdapter<ApiResponse<NoData>> =
+    private val noDataAdapter: JsonAdapter<ApiResponseDto<NoData>> =
         moshi.adapter(noDataResponseType)
 
     /** 验证业务成功时按照声明的泛型解析 `data`。 */
@@ -51,7 +51,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals(ApiResponseDto.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertEquals("value", result.data)
         assertNull(result.fieldErrors)
@@ -65,7 +65,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals(ApiResponseDto.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertNull(result.data)
         assertNull(result.fieldErrors)
@@ -79,7 +79,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals(ApiResponseDto.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertSame(NoData, result.data)
         assertNull(result.fieldErrors)
@@ -93,7 +93,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals(ApiResponseDto.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertEquals("value", result.data)
         assertNull(result.fieldErrors)
@@ -116,7 +116,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_VALIDATION_ERROR, result.code)
+        assertEquals(ApiResponseDto.CODE_VALIDATION_ERROR, result.code)
         assertEquals("validation failed", result.msg)
         assertNull(result.data)
         assertEquals(
@@ -142,7 +142,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_VALIDATION_ERROR, result.code)
+        assertEquals(ApiResponseDto.CODE_VALIDATION_ERROR, result.code)
         assertEquals("validation failed", result.msg)
         assertNull(result.data)
         assertEquals(
@@ -164,7 +164,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_VALIDATION_ERROR, result.code)
+        assertEquals(ApiResponseDto.CODE_VALIDATION_ERROR, result.code)
         assertEquals("validation failed", result.msg)
         assertNull(result.data)
         assertEquals(
@@ -242,7 +242,7 @@ class ApiResponseJsonAdapterFactoryTest {
         )
 
         assertNotNull(result)
-        assertEquals(ApiResponse.CODE_SUCCESS, result.code)
+        assertEquals(ApiResponseDto.CODE_SUCCESS, result.code)
         assertEquals("success", result.msg)
         assertEquals("value", result.data)
         assertNull(result.fieldErrors)
@@ -251,8 +251,8 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证业务成功响应将泛型数据写入协议的 `data` 字段。 */
     @Test
     fun toJson_withSuccessfulStringResponse_writesData() {
-        val response = ApiResponse(
-            code = ApiResponse.CODE_SUCCESS,
+        val response = ApiResponseDto(
+            code = ApiResponseDto.CODE_SUCCESS,
             msg = "success",
             data = "value",
         )
@@ -268,8 +268,8 @@ class ApiResponseJsonAdapterFactoryTest {
     /** 验证表单字段错误序列化到协议的 `data` 字段，而不是模型属性名。 */
     @Test
     fun toJson_withValidationError_writesFieldErrors() {
-        val response = ApiResponse<String>(
-            code = ApiResponse.CODE_VALIDATION_ERROR,
+        val response = ApiResponseDto<String>(
+            code = ApiResponseDto.CODE_VALIDATION_ERROR,
             msg = "validation failed",
             data = null,
             fieldErrors = mapOf(

@@ -1,6 +1,6 @@
 package com.veyline.app.ui.error
 
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.result.ApiResult
 
 /**
  * 将网络调用失败转换为大多数页面可以统一处理的 UI 错误。

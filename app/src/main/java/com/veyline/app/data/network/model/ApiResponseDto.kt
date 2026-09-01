@@ -10,12 +10,12 @@ package com.veyline.app.data.network.model
  * - 其他状态码：业务处理失败，具体含义由相应业务或全局错误处理逻辑判断。
  *
  * 本类型保留 [msg] 命名以直接对应服务端传输字段；它只描述响应协议，不负责将错误转换为
- * [ApiResult]、抛出异常或生成用户提示。后续的自定义 Moshi Adapter 会根据 [code] 解析
+ * `ApiResult`、抛出异常或生成用户提示。后续的自定义 Moshi Adapter 会根据 [code] 解析
  * 多态的 `data` 字段：业务成功时写入 [data]，字段验证失败时写入 [fieldErrors]。
  *
  * ## Moshi Adapter 策略
  *
- * 本类型不使用 `@JsonClass(generateAdapter = true)`。`ApiResponse<T>` 是所有接口共享的泛型
+ * 本类型不使用 `@JsonClass(generateAdapter = true)`。`ApiResponseDto<T>` 是所有接口共享的泛型
  * 响应包装结构，并且 `data` 会随业务状态码在 `T` 与字段错误对象之间变化，需要由自定义
  * `JsonAdapter.Factory` 统一选择解析策略。具体的 Request、Response 等业务数据类没有这种
  * 多态结构，仍应优先使用 `@JsonClass(generateAdapter = true)` 生成 Adapter，避免反射解析。
@@ -29,7 +29,7 @@ package com.veyline.app.data.network.model
  * @property data 业务成功时的响应数据。
  * @property fieldErrors 字段名与对应错误信息，仅在字段验证失败时由解析器填充。
  */
-data class ApiResponse<T>(
+data class ApiResponseDto<T>(
     val code: Int,
     val msg: String?,
     val data: T?,

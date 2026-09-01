@@ -1,6 +1,6 @@
 package com.veyline.app.data.paging
 
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.result.ApiResult
 
 /**
  * 将结构化的 API 失败适配为 Paging 3 要求的异常形式。

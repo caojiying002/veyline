@@ -3,9 +3,9 @@ package com.veyline.app.feature.merchant.data
 import androidx.paging.testing.asSnapshot
 import com.veyline.app.data.image.ImageUrlResolver
 import com.veyline.app.data.network.exception.InvalidApiDataException
-import com.veyline.app.data.network.model.ApiResponse
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
+import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
@@ -56,8 +56,8 @@ class MerchantRepositoryTest {
                 cityCode = "city-a",
             )
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = PagedDataDto(
                     records = listOf(merchantDto),
@@ -93,8 +93,8 @@ class MerchantRepositoryTest {
         coEvery {
             apiService.getMerchantCities()
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = listOf(
                     MerchantCityDto(
@@ -131,8 +131,8 @@ class MerchantRepositoryTest {
         coEvery {
             apiService.getMerchantCities()
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = emptyList(),
             ),
@@ -157,8 +157,8 @@ class MerchantRepositoryTest {
         coEvery {
             apiService.getMerchantCities()
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = listOf(
                     MerchantCityDto(
@@ -196,7 +196,7 @@ class MerchantRepositoryTest {
         coEvery {
             apiService.getMerchantCities()
         } returns Response.success(
-            ApiResponse(
+            ApiResponseDto(
                 code = 1000,
                 msg = "business failed",
                 data = null,
@@ -222,8 +222,8 @@ class MerchantRepositoryTest {
     @Test
     fun getMerchantCities_withConcurrentInitialCalls_requestsOnce() = runTest {
         val response = Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = listOf(
                     MerchantCityDto(

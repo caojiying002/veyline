@@ -3,7 +3,7 @@ package com.veyline.app.feature.merchant.data.paging
 import androidx.paging.PagingSource
 import com.veyline.app.data.image.ImageUrlResolver
 import com.veyline.app.data.network.exception.InvalidApiDataException
-import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
@@ -44,8 +44,8 @@ class MerchantPagingSourceTest {
                 cityCode = cityCode,
             )
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = PagedDataDto(
                     records = listOf(merchantDto),
@@ -103,8 +103,8 @@ class MerchantPagingSourceTest {
                 cityCode = cityCode,
             )
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = PagedDataDto(
                     records = listOf(merchantDto),
@@ -144,8 +144,8 @@ class MerchantPagingSourceTest {
                 cityCode = null,
             )
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = PagedDataDto(
                     records = emptyList(),
@@ -185,8 +185,8 @@ class MerchantPagingSourceTest {
                 cityCode = null,
             )
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = PagedDataDto(
                     records = null, // 空页必须返回空数组，null 属于分页协议异常
@@ -224,8 +224,8 @@ class MerchantPagingSourceTest {
                 cityCode = null,
             )
         } returns Response.success(
-            ApiResponse(
-                code = ApiResponse.CODE_SUCCESS,
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = PagedDataDto(
                     records = emptyList(),

@@ -1,7 +1,7 @@
 package com.veyline.app.ui.error
 
-import com.veyline.app.data.network.model.ApiResult
-import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.ApiResponseDto
+import com.veyline.app.data.network.result.ApiResult
 import java.io.IOException
 import kotlin.test.assertSame
 import org.junit.Test
@@ -42,7 +42,7 @@ class UiErrorMapperTest {
     @Test
     fun toUiError_withValidationFailure_returnsTechnical() {
         val failure = ApiResult.Failure.Validation(
-            code = ApiResponse.CODE_VALIDATION_ERROR,
+            code = ApiResponseDto.CODE_VALIDATION_ERROR,
             message = "validation failed",
             fieldErrors = mapOf("username" to "required"),
         )

@@ -1,6 +1,6 @@
 package com.veyline.app.feature.merchant.presentation.city
 
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.merchant.data.MerchantRepository
 import com.veyline.app.feature.merchant.domain.model.MerchantCity
 import com.veyline.app.test.MainDispatcherRule

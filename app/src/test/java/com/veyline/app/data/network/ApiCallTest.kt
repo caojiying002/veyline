@@ -4,9 +4,9 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.veyline.app.data.network.exception.EmptyResponseBodyException
 import com.veyline.app.data.network.exception.MissingDataException
-import com.veyline.app.data.network.model.ApiResponse
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.NoData
+import com.veyline.app.data.network.result.ApiResult
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
@@ -26,8 +26,8 @@ class ApiCallTest {
     fun apiCall_withSuccessfulResponse_returnsSuccess() = runTest {
         val result = apiCall {
             Response.success(
-                ApiResponse(
-                    code = ApiResponse.CODE_SUCCESS,
+                ApiResponseDto(
+                    code = ApiResponseDto.CODE_SUCCESS,
                     msg = "success",
                     data = "value",
                 ),
@@ -48,8 +48,8 @@ class ApiCallTest {
 
         val result = apiCall {
             Response.success(
-                ApiResponse<String>(
-                    code = ApiResponse.CODE_VALIDATION_ERROR,
+                ApiResponseDto<String>(
+                    code = ApiResponseDto.CODE_VALIDATION_ERROR,
                     msg = "validation failed",
                     data = null,
                     fieldErrors = fieldErrors,
@@ -58,7 +58,7 @@ class ApiCallTest {
         }
 
         val expected = ApiResult.Failure.Validation(
-            code = ApiResponse.CODE_VALIDATION_ERROR,
+            code = ApiResponseDto.CODE_VALIDATION_ERROR,
             message = "validation failed",
             fieldErrors = fieldErrors,
         )
@@ -71,7 +71,7 @@ class ApiCallTest {
     fun apiCall_withBusinessError_returnsBusinessFailure() = runTest {
         val result = apiCall {
             Response.success(
-                ApiResponse<String>(
+                ApiResponseDto<String>(
                     code = 1000,
                     msg = "business failed",
                     data = null,
@@ -92,8 +92,8 @@ class ApiCallTest {
     fun apiCall_withMissingData_returnsSerializationFailure() = runTest {
         val result = apiCall {
             Response.success(
-                ApiResponse<String>(
-                    code = ApiResponse.CODE_SUCCESS,
+                ApiResponseDto<String>(
+                    code = ApiResponseDto.CODE_SUCCESS,
                     msg = "success",
                     data = null,
                 ),
@@ -108,7 +108,7 @@ class ApiCallTest {
     @Test
     fun apiCall_withEmptyResponseBody_returnsSerializationFailure() = runTest {
         val result = apiCall {
-            Response.success<ApiResponse<String>>(null)
+            Response.success<ApiResponseDto<String>>(null)
         }
 
         assertIs<ApiResult.Failure.Serialization>(result)
@@ -130,7 +130,7 @@ class ApiCallTest {
     @Test
     fun apiCall_withUnsuccessfulResponse_returnsHttpFailure() = runTest {
         val result = apiCall {
-            Response.error<ApiResponse<String>>(
+            Response.error<ApiResponseDto<String>>(
                 404,
                 "".toResponseBody(),
             )

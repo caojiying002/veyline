@@ -1,4 +1,4 @@
-package com.veyline.app.data.network.model
+package com.veyline.app.data.network.result
 
 import java.io.IOException
 
@@ -54,7 +54,7 @@ sealed interface ApiResult<out T> {
         /**
          * HTTP 请求成功，但服务端返回字段验证失败。
          *
-         * 具体协议状态码和响应字段解析规则属于 [ApiResponse] 与网络解析器的职责，本类型只
+         * 具体协议状态码和响应字段解析规则属于 `ApiResponseDto` 与网络解析器的职责，本类型只
          * 保存转换后的结果，不依赖服务端使用的魔法数字或 JSON 字段结构。
          *
          * @property code 服务端业务错误码。

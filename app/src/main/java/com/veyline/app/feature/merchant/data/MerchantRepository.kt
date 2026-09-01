@@ -5,7 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.veyline.app.data.network.apiCall
 import com.veyline.app.data.network.exception.InvalidApiDataException
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.merchant.data.mapper.MerchantCityMapper
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.paging.MerchantPagingSource

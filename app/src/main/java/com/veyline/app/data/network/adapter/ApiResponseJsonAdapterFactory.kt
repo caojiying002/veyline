@@ -6,15 +6,15 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.NoData
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
- * 为 [ApiResponse] 创建能够根据业务状态码解析多态 `data` 字段的 Moshi Adapter。
+ * 为 [ApiResponseDto] 创建能够根据业务状态码解析多态 `data` 字段的 Moshi Adapter。
  *
- * Adapter 先通过 [JsonReader.peekJson] 读取 [ApiResponse.code]，不移动原始 Reader；随后再
+ * Adapter 先通过 [JsonReader.peekJson] 读取 [ApiResponseDto.code]，不移动原始 Reader；随后再
  * 使用原始 Reader 完成流式解析。该方式允许 `code` 出现在 `data` 之后，同时避免把完整
  * JSON 转成通用 Map 后产生类型信息损失和额外对象分配。
  */
@@ -25,20 +25,20 @@ class ApiResponseJsonAdapterFactory : JsonAdapter.Factory {
         annotations: Set<Annotation>,
         moshi: Moshi,
     ): JsonAdapter<*>? {
-        // 只接管未携带 JsonQualifier 的 ApiResponse<T>；限定类型应交给对应的专用 Adapter。
-        if (Types.getRawType(type) != ApiResponse::class.java
+        // 只接管未携带 JsonQualifier 的 ApiResponseDto<T>；限定类型应交给对应的专用 Adapter。
+        if (Types.getRawType(type) != ApiResponseDto::class.java
             || annotations.isNotEmpty()
         ) {
             return null
         }
 
         require(type is ParameterizedType) {
-            "ApiResponse must declare a type parameter"
+            "ApiResponseDto must declare a type parameter"
         }
 
         val dataType = type.actualTypeArguments.single()
         val dataAdapter = moshi.adapter<Any>(dataType)
-        // 特殊处理：ApiResponse<NoData>类型允许`data`字段缺失或JSON null
+        // 特殊处理：ApiResponseDto<NoData>类型允许`data`字段缺失或JSON null
         val defaultDataWhenAbsent =
             if (dataType == NoData::class.java) NoData else null
 
@@ -58,7 +58,7 @@ class ApiResponseJsonAdapterFactory : JsonAdapter.Factory {
 }
 
 /**
- * 根据 `code` 字段的值区分解析 [ApiResponse] 的 JSON Adapter。
+ * 根据 `code` 字段的值区分解析 [ApiResponseDto] 的 JSON Adapter。
  *
  * 业务成功时，使用响应声明的泛型 Adapter 解析 `data`；表单验证失败时，
  * 将 `data` 解析为字段错误 Map；其他业务失败则跳过 `data`，避免错误响应中的
@@ -67,15 +67,15 @@ class ApiResponseJsonAdapterFactory : JsonAdapter.Factory {
  * @param dataAdapter 解析和序列化业务成功响应中 `data` 字段的 Adapter。
  * @param fieldErrorsAdapter 解析和序列化表单验证错误中字段错误 Map 的 Adapter。
  * @param defaultDataWhenAbsent 业务成功但 JSON 完全缺少 `data` 字段时使用的默认值。
- * 当响应类型为 `ApiResponse<NoData>` 时传入 [NoData]；其他类型传入 `null`，保留数据缺失状态
+ * 当响应类型为 `ApiResponseDto<NoData>` 时传入 [NoData]；其他类型传入 `null`，保留数据缺失状态
  * 供上层转换为响应协议异常。
  */
 private class ApiResponseJsonAdapter<T>(
     private val dataAdapter: JsonAdapter<T>,
     private val fieldErrorsAdapter: JsonAdapter<Map<String, String>>,
     private val defaultDataWhenAbsent: T?,
-) : JsonAdapter<ApiResponse<T>>() {
-    override fun fromJson(reader: JsonReader): ApiResponse<T> {
+) : JsonAdapter<ApiResponseDto<T>>() {
+    override fun fromJson(reader: JsonReader): ApiResponseDto<T> {
         val code = readRequiredCode(reader)
         var msg: String? = null
         /* 明确记录 `data` 字段是否出现 */
@@ -91,10 +91,10 @@ private class ApiResponseJsonAdapter<T>(
                 FIELD_DATA -> {
                     hasDataField = true
                     when (code) {
-                        ApiResponse.CODE_SUCCESS -> {
+                        ApiResponseDto.CODE_SUCCESS -> {
                             data = dataAdapter.fromJson(reader)
                         }
-                        ApiResponse.CODE_VALIDATION_ERROR -> {
+                        ApiResponseDto.CODE_VALIDATION_ERROR -> {
                             if (reader.peek() == JsonReader.Token.NULL) {
                                 reader.skipValue()
                             } else {
@@ -109,17 +109,17 @@ private class ApiResponseJsonAdapter<T>(
         }
         reader.endObject()
 
-        // ApiResponse<NoData>类型允许缺失 `data` 字段；其他响应类型仍保持严格校验。
-        if (code == ApiResponse.CODE_SUCCESS && !hasDataField) {
+        // ApiResponseDto<NoData>类型允许缺失 `data` 字段；其他响应类型仍保持严格校验。
+        if (code == ApiResponseDto.CODE_SUCCESS && !hasDataField) {
             data = defaultDataWhenAbsent
         }
 
         // 将验证错误响应中缺失和显式为 null 的 data 统一为空 Map，简化上层处理。
-        if (code == ApiResponse.CODE_VALIDATION_ERROR && fieldErrors == null) {
+        if (code == ApiResponseDto.CODE_VALIDATION_ERROR && fieldErrors == null) {
             fieldErrors = emptyMap()
         }
 
-        return ApiResponse(
+        return ApiResponseDto(
             code = code,
             msg = msg,
             data = data,
@@ -127,7 +127,7 @@ private class ApiResponseJsonAdapter<T>(
         )
     }
 
-    override fun toJson(writer: JsonWriter, value: ApiResponse<T>?) {
+    override fun toJson(writer: JsonWriter, value: ApiResponseDto<T>?) {
         if (value == null) {
             writer.nullValue()
             return
@@ -139,8 +139,8 @@ private class ApiResponseJsonAdapter<T>(
 
         writer.name(FIELD_DATA)
         when (value.code) {
-            ApiResponse.CODE_SUCCESS -> dataAdapter.toJson(writer, value.data)
-            ApiResponse.CODE_VALIDATION_ERROR -> {
+            ApiResponseDto.CODE_SUCCESS -> dataAdapter.toJson(writer, value.data)
+            ApiResponseDto.CODE_VALIDATION_ERROR -> {
                 fieldErrorsAdapter.toJson(writer, value.fieldErrors.orEmpty())
             }
             else -> writer.nullValue()
@@ -153,7 +153,7 @@ private class ApiResponseJsonAdapter<T>(
         try {
             if (peekedReader.peek() != JsonReader.Token.BEGIN_OBJECT) {
                 throw JsonDataException(
-                    "Expected ApiResponse object at ${peekedReader.path}",
+                    "Expected ApiResponseDto object at ${peekedReader.path}",
                 )
             }
 

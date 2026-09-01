@@ -1,6 +1,6 @@
 package com.veyline.app.feature.merchant.data.remote
 
-import com.veyline.app.data.network.model.ApiResponse
+import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
@@ -22,7 +22,7 @@ interface MerchantApiService {
      * @return 包含商家城市网络模型列表的通用 API 响应。
      */
     @GET("config/merchantCity.json")
-    suspend fun getMerchantCities(): Response<ApiResponse<List<MerchantCityDto>>>
+    suspend fun getMerchantCities(): Response<ApiResponseDto<List<MerchantCityDto>>>
 
     /**
      * 按城市获取商家摘要分页数据。
@@ -40,5 +40,5 @@ interface MerchantApiService {
         @Query("page") page: Int,
         @Query("perPage") perPage: Int,
         @Query("cityCode") cityCode: String?,
-    ): Response<ApiResponse<PagedDataDto<MerchantSummaryDto>>>
+    ): Response<ApiResponseDto<PagedDataDto<MerchantSummaryDto>>>
 }

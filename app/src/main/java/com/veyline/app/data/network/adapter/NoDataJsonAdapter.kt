@@ -16,7 +16,7 @@ import com.veyline.app.data.network.model.NoData
  * 不保留或记录原始数据，并统一返回 [NoData]。语法损坏的 JSON 仍由 Moshi 正常抛出解析异常。
  *
  * 这种宽容行为是刻意设计的，同时也意味着被消费的数据无法用于发现协议变化。只有接口
- * 契约明确声明 `data` 没有业务含义时才能使用 `ApiResponse<NoData>`；不得为了省略业务模型
+ * 契约明确声明 `data` 没有业务含义时才能使用 `ApiResponseDto<NoData>`；不得为了省略业务模型
  * 或忽略暂时不需要的字段而使用，否则有意义的数据也会被静默丢弃。
  */
 class NoDataJsonAdapter {

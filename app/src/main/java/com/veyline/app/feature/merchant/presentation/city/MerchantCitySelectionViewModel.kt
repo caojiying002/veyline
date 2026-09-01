@@ -3,7 +3,7 @@ package com.veyline.app.feature.merchant.presentation.city
 import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.veyline.app.data.network.model.ApiResult
+import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.merchant.data.MerchantRepository
 import com.veyline.app.feature.merchant.domain.model.MerchantCity
 import com.veyline.app.ui.error.UiError

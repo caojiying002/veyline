@@ -4,8 +4,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.veyline.app.data.network.apiCall
 import com.veyline.app.data.network.exception.InvalidApiDataException
-import com.veyline.app.data.network.model.ApiResult
 import com.veyline.app.data.network.model.PagedDataDto
+import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.data.paging.FIRST_PAGE
 import com.veyline.app.data.paging.PagingFailureException
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
