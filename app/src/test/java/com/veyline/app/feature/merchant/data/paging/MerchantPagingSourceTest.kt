@@ -26,7 +26,7 @@ class MerchantPagingSourceTest {
 
     /** 验证首次加载成功时返回映射后的商家数据和下一页页码。 */
     @Test
-    fun `load first page returns merchants and next page key`() = runTest {
+    fun load_withFirstPage_returnsMerchantsAndNextPageKey() = runTest {
         val cityCode = "city-a"
         val merchantDto = MerchantSummaryDto(
             id = "merchant-a",
@@ -85,7 +85,7 @@ class MerchantPagingSourceTest {
 
     /** 验证加载最后一页成功时不再提供下一页页码。 */
     @Test
-    fun `load last page returns null next page key`() = runTest {
+    fun load_withLastPage_returnsNullNextPageKey() = runTest {
         val cityCode = "city-a"
         val merchantDto = MerchantSummaryDto(
             id = "merchant-b",
@@ -135,7 +135,7 @@ class MerchantPagingSourceTest {
 
     /** 验证第一页没有任何记录时返回正常空页面，而不是数据异常。 */
     @Test
-    fun `load empty first page returns empty page`() = runTest {
+    fun load_withEmptyFirstPage_returnsEmptyPage() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchants(
@@ -176,7 +176,7 @@ class MerchantPagingSourceTest {
 
     /** 验证分页响应缺少 records 时返回数据无效错误。 */
     @Test
-    fun `load response without records returns invalid data error`() = runTest {
+    fun load_withResponseWithoutRecords_returnsInvalidDataError() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchants(
@@ -215,7 +215,7 @@ class MerchantPagingSourceTest {
 
     /** 验证服务端返回页码与请求页码不一致时返回数据无效错误。 */
     @Test
-    fun `load response with mismatched current page returns invalid data error`() = runTest {
+    fun load_withMismatchedCurrentPage_returnsInvalidDataError() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchants(
@@ -255,25 +255,25 @@ class MerchantPagingSourceTest {
     /** 验证业务失败被包装为保留原始失败分类的 Paging 加载错误。 */
     @Ignore("待补充 PagingFailureException 业务失败测试")
     @Test
-    fun `load with business failure returns paging failure error`() {
+    fun load_withBusinessFailure_returnsPagingFailureError() {
     }
 
     /** 验证网络失败被包装为 Paging 加载错误，并保留原始异常原因。 */
     @Ignore("待补充 PagingFailureException 网络失败测试")
     @Test
-    fun `load with network failure returns paging failure error with cause`() {
+    fun load_withNetworkFailure_returnsPagingFailureErrorWithCause() {
     }
 
     /** 验证同一页包含重复商家 ID 时只保留第一次出现的数据。 */
     @Ignore("待补充页内重复 ID 测试")
     @Test
-    fun `load page with duplicate merchant ids keeps first occurrence`() {
+    fun load_withDuplicateIdsInPage_keepsFirstOccurrence() {
     }
 
     /** 验证后续页包含已加载商家 ID 时只保留第一次出现的数据。 */
     @Ignore("待补充跨页重复 ID 测试")
     @Test
-    fun `load next page with duplicate merchant ids keeps first occurrence`() {
+    fun load_withDuplicateIdsAcrossPages_keepsFirstOccurrence() {
     }
 
     private fun createPagingSource(

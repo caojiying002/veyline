@@ -45,7 +45,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证业务成功时按照声明的泛型解析 `data`。 */
     @Test
-    fun `fromJson with successful response parses String data`() {
+    fun fromJson_withSuccessfulStringResponse_parsesData() {
         val result = stringAdapter.fromJson(
             """{"code":0,"msg":"success","data":"value"}""",
         )
@@ -59,7 +59,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证普通成功响应缺少 `data` 字段时保留数据缺失状态。 */
     @Test
-    fun `fromJson with successful String response without data returns null data`() {
+    fun fromJson_withSuccessfulStringResponseWithoutData_returnsNullData() {
         val result = stringAdapter.fromJson(
             """{"code":0,"msg":"success"}""",
         )
@@ -73,7 +73,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证无业务数据的成功响应缺少 `data` 字段时补充 [NoData]。 */
     @Test
-    fun `fromJson with successful NoData response without data returns NoData`() {
+    fun fromJson_withSuccessfulNoDataResponseWithoutData_returnsNoData() {
         val result = noDataAdapter.fromJson(
             """{"code":0,"msg":"success"}""",
         )
@@ -87,7 +87,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证 `code` 位于 `data` 之后时，两阶段解析仍能正确选择数据 Adapter。 */
     @Test
-    fun `fromJson with data before code parses successfully`() {
+    fun fromJson_withDataBeforeCode_parsesSuccessfully() {
         val result = stringAdapter.fromJson(
             """{"data":"value","msg":"success","code":0}""",
         )
@@ -101,7 +101,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证表单验证失败时将原始 `data` 解析为字段错误。 */
     @Test
-    fun `fromJson with validation error parses field errors`() {
+    fun fromJson_withValidationError_parsesFieldErrors() {
         val result = stringAdapter.fromJson(
             """
             {
@@ -130,7 +130,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证验证错误中的 `data: null` 被归一为空字段错误 Map。 */
     @Test
-    fun `fromJson with null validation data returns empty field errors`() {
+    fun fromJson_withNullValidationData_returnsEmptyFieldErrors() {
         val result = stringAdapter.fromJson(
             """
             {
@@ -153,7 +153,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证验证错误缺少 `data` 字段时仍返回空字段错误 Map。 */
     @Test
-    fun `fromJson with validation error without data returns empty field errors`() {
+    fun fromJson_withValidationErrorWithoutData_returnsEmptyFieldErrors() {
         val result = stringAdapter.fromJson(
             """
             {
@@ -175,7 +175,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证普通业务错误会跳过与成功类型不兼容的 `data`。 */
     @Test
-    fun `fromJson with business error ignores incompatible data`() {
+    fun fromJson_withBusinessError_ignoresIncompatibleData() {
         val result = stringAdapter.fromJson(
             """
             {
@@ -197,7 +197,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证缺少必需的 `code` 字段时解析失败。 */
     @Test
-    fun `fromJson without code throws JsonDataException`() {
+    fun fromJson_withoutCode_throwsJsonDataException() {
         assertFailsWith<JsonDataException> {
             stringAdapter.fromJson(
                 """{"msg":"failed","data":null}""",
@@ -207,7 +207,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证必需的 `code` 显式为 JSON `null` 时解析失败。 */
     @Test
-    fun `fromJson with null code throws JsonDataException`() {
+    fun fromJson_withNullCode_throwsJsonDataException() {
         assertFailsWith<JsonDataException> {
             stringAdapter.fromJson(
                 """{"code":null,"msg":"failed","data":null}""",
@@ -217,7 +217,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证 `code` 不是整数类型时解析失败。 */
     @Test
-    fun `fromJson with invalid code type throws JsonDataException`() {
+    fun fromJson_withInvalidCodeType_throwsJsonDataException() {
         assertFailsWith<JsonDataException> {
             stringAdapter.fromJson(
                 """{"code":true,"msg":"failed","data":null}""",
@@ -227,7 +227,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证新增的未知字段不会影响既有响应字段解析。 */
     @Test
-    fun `fromJson with unknown field parses known fields`() {
+    fun fromJson_withUnknownField_parsesKnownFields() {
         val result = stringAdapter.fromJson(
             """
             {
@@ -250,7 +250,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证业务成功响应将泛型数据写入协议的 `data` 字段。 */
     @Test
-    fun `toJson with successful response writes String data`() {
+    fun toJson_withSuccessfulStringResponse_writesData() {
         val response = ApiResponse(
             code = ApiResponse.CODE_SUCCESS,
             msg = "success",
@@ -267,7 +267,7 @@ class ApiResponseJsonAdapterFactoryTest {
 
     /** 验证表单字段错误序列化到协议的 `data` 字段，而不是模型属性名。 */
     @Test
-    fun `toJson with validation error writes field errors`() {
+    fun toJson_withValidationError_writesFieldErrors() {
         val response = ApiResponse<String>(
             code = ApiResponse.CODE_VALIDATION_ERROR,
             msg = "validation failed",

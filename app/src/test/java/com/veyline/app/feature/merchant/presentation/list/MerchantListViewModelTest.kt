@@ -35,7 +35,7 @@ class MerchantListViewModelTest {
 
     /** 验证仅订阅 [MerchantListViewModel.merchants]、但未发送 InitialLoad 时不会请求分页数据。 */
     @Test
-    fun `collect merchants before InitialLoad does not request merchants`() = runTest {
+    fun collectMerchants_beforeInitialLoad_doesNotRequestMerchants() = runTest {
         val repository = mockk<MerchantRepository>()
         val viewModel = MerchantListViewModel(repository)
 
@@ -62,7 +62,7 @@ class MerchantListViewModelTest {
      * 订阅后重放，加载不会因为“信号早于收集”而丢失。
      */
     @Test
-    fun `InitialLoad before collection requests merchants for all cities`() = runTest {
+    fun initialLoad_beforeCollection_requestsMerchantsForAllCities() = runTest {
         val repository = mockk<MerchantRepository>()
         every {
             repository.getMerchants(cityCode = null)
@@ -89,18 +89,18 @@ class MerchantListViewModelTest {
     /** 验证首次加载前选择城市时，分页流使用最新的城市代码。 */
     @Ignore("待补充首次加载前选择城市测试")
     @Test
-    fun `SelectCity before InitialLoad requests merchants for selected city`() = runTest {
+    fun selectCity_beforeInitialLoad_requestsMerchantsForSelectedCity() = runTest {
     }
 
     /** 验证分页流启动后选择其他城市时，切换到新城市的分页数据。 */
     @Ignore("待补充加载后切换城市测试")
     @Test
-    fun `SelectCity after InitialLoad switches merchant flow`() = runTest {
+    fun selectCity_afterInitialLoad_switchesMerchantFlow() = runTest {
     }
 
     /** 验证重复发送首次加载操作时只建立一次商家分页流。 */
     @Ignore("待补充重复首次加载测试")
     @Test
-    fun `repeated InitialLoad requests merchants once`() = runTest {
+    fun initialLoad_whenRepeated_requestsMerchantsOnce() = runTest {
     }
 }

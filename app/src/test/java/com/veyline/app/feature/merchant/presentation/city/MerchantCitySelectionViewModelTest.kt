@@ -31,7 +31,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证创建 ViewModel 时只提供初始状态，不会自动请求城市数据。 */
     @Test
-    fun `create ViewModel does not request cities`() = runTest {
+    fun createViewModel_withoutInitialLoad_doesNotRequestCities() = runTest {
         val repository = mockk<MerchantRepository>()
         val viewModel = MerchantCitySelectionViewModel(repository)
 
@@ -46,7 +46,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证首次加载成功后更新城市列表并结束加载状态。 */
     @Test
-    fun `InitialLoad with successful response updates cities`() = runTest {
+    fun initialLoad_withSuccessfulResponse_updatesCities() = runTest {
         val cities = listOf(
             MerchantCity(
                 code = "code-a",
@@ -77,7 +77,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证重复发送首次加载操作时只请求一次城市数据。 */
     @Test
-    fun `repeated InitialLoad requests cities once`() = runTest {
+    fun initialLoad_whenRepeated_requestsCitiesOnce() = runTest {
         val repository = mockk<MerchantRepository>()
 
         coEvery {
@@ -97,7 +97,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证首次加载返回空列表时结束加载，并保持无错误的空数据状态。 */
     @Test
-    fun `InitialLoad with empty cities updates empty state`() = runTest {
+    fun initialLoad_withEmptyCities_updatesEmptyState() = runTest {
         val repository = mockk<MerchantRepository>()
         coEvery {
             repository.getMerchantCities()
@@ -118,7 +118,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证网络连接失败时结束加载，并转换为连接类 UI 错误。 */
     @Test
-    fun `InitialLoad with Network failure updates Connection error`() = runTest {
+    fun initialLoad_withNetworkFailure_updatesConnectionError() = runTest {
         val repository = mockk<MerchantRepository>()
         coEvery {
             repository.getMerchantCities()
@@ -141,7 +141,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证普通业务失败时结束加载，并转换为技术类 UI 错误。 */
     @Test
-    fun `InitialLoad with Business failure updates Technical error`() = runTest {
+    fun initialLoad_withBusinessFailure_updatesTechnicalError() = runTest {
         val repository = mockk<MerchantRepository>()
         coEvery {
             repository.getMerchantCities()
@@ -165,7 +165,7 @@ class MerchantCitySelectionViewModelTest {
 
     /** 验证首次加载失败后用户主动重试，可以重新请求并恢复为成功状态。 */
     @Test
-    fun `Retry after failed InitialLoad updates successful state`() = runTest {
+    fun retry_afterFailedInitialLoad_updatesSuccessfulState() = runTest {
         val cities = listOf(
             MerchantCity(
                 code = "code-a",
@@ -215,7 +215,7 @@ class MerchantCitySelectionViewModelTest {
     /** 验证城市加载尚未完成时发送重试，不会发起并发请求。 */
     @Ignore("待补充加载期间重试的并发请求测试")
     @Test
-    fun `Retry while loading requests cities once`() = runTest {
+    fun retry_whileLoading_requestsCitiesOnce() = runTest {
 
     }
 }

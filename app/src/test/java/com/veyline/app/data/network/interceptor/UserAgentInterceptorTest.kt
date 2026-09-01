@@ -17,7 +17,7 @@ class UserAgentInterceptorTest {
 
     /** 验证原请求未设置 User-Agent 时添加配置的请求头值。 */
     @Test
-    fun `request without User-Agent adds configured value`() {
+    fun intercept_withoutUserAgent_addsConfiguredValue() {
         val expectedUserAgent = "Veyline/Test"
 
         MockWebServer().use { server ->
@@ -45,7 +45,7 @@ class UserAgentInterceptorTest {
 
     /** 验证原请求已设置 User-Agent 时覆盖旧值，且不会保留多个同名请求头。 */
     @Test
-    fun `request with User-Agent replaces existing value`() {
+    fun intercept_withUserAgent_replacesExistingValue() {
         val existingUserAgent = "Existing/Test"
         val expectedUserAgent = "Veyline/Test"
 

@@ -16,7 +16,7 @@ class MerchantCityMapperTest {
 
     /** 验证合法的城市网络模型列表被转换为对应的领域模型列表。 */
     @Test
-    fun `toDomainModels with valid cities returns domain models`() {
+    fun map_withValidCities_returnsDomainModels() {
         val cityDtos = listOf(
             MerchantCityDto(code = "code-a", name = "城市甲"),
             MerchantCityDto(code = "code-b", name = "城市乙"),
@@ -33,7 +33,7 @@ class MerchantCityMapperTest {
 
     /** 验证城市 code 和 name 的首尾空白不会进入领域模型。 */
     @Test
-    fun `toDomainModels with surrounding whitespace trims fields`() {
+    fun map_withSurroundingWhitespace_trimsFields() {
         val cityDtos = listOf(
             MerchantCityDto(
                 code = "  code-a  ",
@@ -54,7 +54,7 @@ class MerchantCityMapperTest {
 
     /** 验证空的网络模型列表被转换为空的领域模型列表。 */
     @Test
-    fun `toDomainModels with empty list returns empty list`() {
+    fun map_withEmptyList_returnsEmptyList() {
         val cityDtos = emptyList<MerchantCityDto>()
 
         val result = MerchantCityMapper.map(cityDtos)
@@ -64,7 +64,7 @@ class MerchantCityMapperTest {
 
     /** 验证规范化后 code 重复时保留接口中第一次出现的城市。 */
     @Test
-    fun `toDomainModels with duplicate codes keeps first city`() {
+    fun map_withDuplicateCodes_keepsFirstCity() {
         val cityDtos = listOf(
             MerchantCityDto(code = "code-a", name = "城市甲"),
             MerchantCityDto(code = "  code-a  ", name = "重复城市"),
@@ -82,7 +82,7 @@ class MerchantCityMapperTest {
 
     /** 验证非法城市会被忽略，且不会影响其他合法城市的转换。 */
     @Test
-    fun `toDomainModels with invalid cities ignores them`() {
+    fun map_withInvalidCities_ignoresThem() {
         val cityDtos = listOf(
             MerchantCityDto(code = "code-a", name = "城市甲"),
             MerchantCityDto(code = null, name = "缺少代码"),
@@ -103,7 +103,7 @@ class MerchantCityMapperTest {
 
     /** 验证非空输入中没有任何有效城市时抛出数据无效异常。 */
     @Test
-    fun `toDomainModels with no valid cities throws invalid data exception`() {
+    fun map_withNoValidCities_throwsInvalidDataException() {
         val cityDtos = listOf(
             MerchantCityDto(
                 code = null,

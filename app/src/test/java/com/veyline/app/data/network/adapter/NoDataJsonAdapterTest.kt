@@ -24,7 +24,7 @@ class NoDataJsonAdapterTest {
 
     /** 验证 JSON `null` 被转换为唯一的 [NoData] 实例。 */
     @Test
-    fun `fromJson with JSON null returns NoData`() {
+    fun fromJson_withJsonNull_returnsNoData() {
         val result = adapter.fromJson("null")
 
         assertSame(NoData, result)
@@ -32,7 +32,7 @@ class NoDataJsonAdapterTest {
 
     /** 验证服务端使用空字符串占位时仍能得到 [NoData]。 */
     @Test
-    fun `fromJson with empty string returns NoData`() {
+    fun fromJson_withEmptyString_returnsNoData() {
         val result = adapter.fromJson("\"\"")
 
         assertSame(NoData, result)
@@ -40,7 +40,7 @@ class NoDataJsonAdapterTest {
 
     /** 验证服务端使用空对象占位时仍能得到 [NoData]。 */
     @Test
-    fun `fromJson with empty object returns NoData`() {
+    fun fromJson_withEmptyObject_returnsNoData() {
         val result = adapter.fromJson("{}")
 
         assertSame(NoData, result)
@@ -48,7 +48,7 @@ class NoDataJsonAdapterTest {
 
     /** 验证 Adapter 能完整消费包含多种 Token 的嵌套 JSON 值。 */
     @Test
-    fun `fromJson with nested array returns NoData`() {
+    fun fromJson_withNestedArray_returnsNoData() {
         val result = adapter.fromJson(
             """[null, "", 1, true, {"key": "value"}]""",
         )
@@ -58,7 +58,7 @@ class NoDataJsonAdapterTest {
 
     /** 验证 [NoData] 始终序列化为 JSON `null`。 */
     @Test
-    fun `toJson with NoData returns JSON null`() {
+    fun toJson_withNoData_writesJsonNull() {
         val result = adapter.toJson(NoData)
 
         assertEquals("null", result)

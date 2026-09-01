@@ -23,7 +23,7 @@ class ApiCallTest {
 
     /** 验证 HTTP 与业务均成功时返回包含业务数据的 [ApiResult.Success]。 */
     @Test
-    fun `apiCall with successful response returns Success`() = runTest {
+    fun apiCall_withSuccessfulResponse_returnsSuccess() = runTest {
         val result = apiCall {
             Response.success(
                 ApiResponse(
@@ -40,7 +40,7 @@ class ApiCallTest {
 
     /** 验证表单字段验证失败时返回包含字段错误的 [ApiResult.Failure.Validation]。 */
     @Test
-    fun `apiCall with validation error returns Validation failure`() = runTest {
+    fun apiCall_withValidationError_returnsValidationFailure() = runTest {
         val fieldErrors = mapOf(
             "username" to "required",
             "password" to "too short",
@@ -68,7 +68,7 @@ class ApiCallTest {
 
     /** 验证普通业务失败时返回 [ApiResult.Failure.Business]。 */
     @Test
-    fun `apiCall with business error returns Business failure`() = runTest {
+    fun apiCall_withBusinessError_returnsBusinessFailure() = runTest {
         val result = apiCall {
             Response.success(
                 ApiResponse<String>(
@@ -89,7 +89,7 @@ class ApiCallTest {
 
     /** 验证成功响应缺少必需数据时返回 [ApiResult.Failure.Serialization]。 */
     @Test
-    fun `apiCall with missing data returns Serialization failure`() = runTest {
+    fun apiCall_withMissingData_returnsSerializationFailure() = runTest {
         val result = apiCall {
             Response.success(
                 ApiResponse<String>(
@@ -106,7 +106,7 @@ class ApiCallTest {
 
     /** 验证成功的 HTTP 响应不包含响应体时返回 [ApiResult.Failure.Serialization]。 */
     @Test
-    fun `apiCall with empty response body returns Serialization failure`() = runTest {
+    fun apiCall_withEmptyResponseBody_returnsSerializationFailure() = runTest {
         val result = apiCall {
             Response.success<ApiResponse<String>>(null)
         }
@@ -117,7 +117,7 @@ class ApiCallTest {
 
     /** 验证无响应体调用在 HTTP 成功时返回包含 [NoData] 的成功结果。 */
     @Test
-    fun `apiCallNoContent with successful response returns Success`() = runTest {
+    fun apiCallNoContent_withSuccessfulResponse_returnsSuccess() = runTest {
         val result = apiCallNoContent {
             Response.success<Unit>(204, null)
         }
@@ -128,7 +128,7 @@ class ApiCallTest {
 
     /** 验证非 2XX 响应按状态码转换为 [ApiResult.Failure.Http]。 */
     @Test
-    fun `apiCall with unsuccessful response returns Http failure`() = runTest {
+    fun apiCall_withUnsuccessfulResponse_returnsHttpFailure() = runTest {
         val result = apiCall {
             Response.error<ApiResponse<String>>(
                 404,
@@ -145,7 +145,7 @@ class ApiCallTest {
 
     /** 验证 Retrofit 抛出 `HttpException` 时保留状态码和原始异常。 */
     @Test
-    fun `apiCall throwing HttpException returns Http failure`() = runTest {
+    fun apiCall_whenThrowingHttpException_returnsHttpFailure() = runTest {
         val exception = HttpException(
             Response.error<String>(
                 500,
@@ -164,7 +164,7 @@ class ApiCallTest {
 
     /** 验证网络 IO 异常被转换为 [ApiResult.Failure.Network]。 */
     @Test
-    fun `apiCall throwing IOException returns Network failure`() = runTest {
+    fun apiCall_whenThrowingIOException_returnsNetworkFailure() = runTest {
         val exception = IOException("network failed")
 
         val result = apiCall<String> {
@@ -177,7 +177,7 @@ class ApiCallTest {
 
     /** 验证 JSON 数据与声明类型不匹配时返回 [ApiResult.Failure.Serialization]。 */
     @Test
-    fun `apiCall throwing JsonDataException returns Serialization failure`() = runTest {
+    fun apiCall_whenThrowingJsonDataException_returnsSerializationFailure() = runTest {
         val exception = JsonDataException("JSON data does not match the declared type")
 
         val result = apiCall<String> {
@@ -190,7 +190,7 @@ class ApiCallTest {
 
     /** 验证 JSON 编码格式非法时返回 [ApiResult.Failure.Serialization]。 */
     @Test
-    fun `apiCall throwing JsonEncodingException returns Serialization failure`() = runTest {
+    fun apiCall_whenThrowingJsonEncodingException_returnsSerializationFailure() = runTest {
         val exception = JsonEncodingException("Malformed JSON")
 
         val result = apiCall<String> {
@@ -203,7 +203,7 @@ class ApiCallTest {
 
     /** 验证协程取消不会被转换为普通请求失败。 */
     @Test
-    fun `apiCall throwing CancellationException rethrows exception`() = runTest {
+    fun apiCall_whenThrowingCancellationException_rethrowsException() = runTest {
         val exception = CancellationException("request cancelled")
 
         val thrown = assertFailsWith<CancellationException> {
@@ -217,7 +217,7 @@ class ApiCallTest {
 
     /** 验证未预期的程序异常不会被网络层吞掉或降级。 */
     @Test
-    fun `apiCall throwing unexpected exception rethrows exception`() = runTest {
+    fun apiCall_whenThrowingUnexpectedException_rethrowsException() = runTest {
         val exception = IllegalStateException("unexpected application error")
 
         val thrown = assertFailsWith<IllegalStateException> {

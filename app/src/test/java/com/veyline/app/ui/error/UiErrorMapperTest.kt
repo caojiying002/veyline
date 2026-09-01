@@ -15,7 +15,7 @@ class UiErrorMapperTest {
 
     /** 验证网络连接失败被转换为连接类 UI 错误。 */
     @Test
-    fun `toUiError with Network failure returns Connection`() {
+    fun toUiError_withNetworkFailure_returnsConnection() {
         val failure = ApiResult.Failure.Network(
             IOException("network failed"),
         )
@@ -27,7 +27,7 @@ class UiErrorMapperTest {
 
     /** 验证未由具体业务处理的普通业务失败被转换为技术类 UI 错误。 */
     @Test
-    fun `toUiError with Business failure returns Technical`() {
+    fun toUiError_withBusinessFailure_returnsTechnical() {
         val failure = ApiResult.Failure.Business(
             code = 1000,
             message = "business failed",
@@ -40,7 +40,7 @@ class UiErrorMapperTest {
 
     /** 验证未由表单页面单独处理的字段验证失败被转换为技术类 UI 错误。 */
     @Test
-    fun `toUiError with Validation failure returns Technical`() {
+    fun toUiError_withValidationFailure_returnsTechnical() {
         val failure = ApiResult.Failure.Validation(
             code = ApiResponse.CODE_VALIDATION_ERROR,
             message = "validation failed",
@@ -54,7 +54,7 @@ class UiErrorMapperTest {
 
     /** 验证 HTTP 状态失败被转换为技术类 UI 错误。 */
     @Test
-    fun `toUiError with Http failure returns Technical`() {
+    fun toUiError_withHttpFailure_returnsTechnical() {
         val failure = ApiResult.Failure.Http(
             statusCode = 503,
             exception = null,
@@ -67,7 +67,7 @@ class UiErrorMapperTest {
 
     /** 验证响应内容无法解析时被转换为技术类 UI 错误。 */
     @Test
-    fun `toUiError with Serialization failure returns Technical`() {
+    fun toUiError_withSerializationFailure_returnsTechnical() {
         val failure = ApiResult.Failure.Serialization(
             exception = IllegalStateException("serialization failed"),
         )
@@ -79,7 +79,7 @@ class UiErrorMapperTest {
 
     /** 验证允许降级处理的未预期失败被转换为技术类 UI 错误。 */
     @Test
-    fun `toUiError with Unexpected failure returns Technical`() {
+    fun toUiError_withUnexpectedFailure_returnsTechnical() {
         val failure = ApiResult.Failure.Unexpected(
             exception = IllegalStateException("unexpected failure"),
         )

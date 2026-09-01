@@ -39,7 +39,7 @@ class MerchantRepositoryTest {
 
     /** 验证商家分页首次加载使用固定页大小，并规范化城市筛选代码。 */
     @Test
-    fun `getMerchants first load uses paging config and normalized city code`() = runTest {
+    fun getMerchants_onFirstLoad_usesPagingConfigAndNormalizedCityCode() = runTest {
         val merchantDto = MerchantSummaryDto(
             id = "merchant-a",
             name = "商家甲",
@@ -88,7 +88,7 @@ class MerchantRepositoryTest {
 
     /** 验证成功加载后复用进程内缓存，不重复请求接口。 */
     @Test
-    fun `getMerchantCities after successful response uses cache`() = runTest {
+    fun getMerchantCities_afterSuccessfulResponse_usesCache() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchantCities()
@@ -126,7 +126,7 @@ class MerchantRepositoryTest {
 
     /** 验证成功返回空列表时不写入缓存，使后续调用能够重新请求。 */
     @Test
-    fun `getMerchantCities after empty successful response requests again`() = runTest {
+    fun getMerchantCities_afterEmptySuccessfulResponse_requestsAgain() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchantCities()
@@ -152,7 +152,7 @@ class MerchantRepositoryTest {
 
     /** 验证城市数据全部无效时不写入缓存，后续调用仍会重新请求。 */
     @Test
-    fun `getMerchantCities after invalid data requests again`() = runTest {
+    fun getMerchantCities_afterInvalidData_requestsAgain() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchantCities()
@@ -191,7 +191,7 @@ class MerchantRepositoryTest {
 
     /** 验证业务失败不写入缓存，后续调用仍会重新请求接口。 */
     @Test
-    fun `getMerchantCities after business error requests again`() = runTest {
+    fun getMerchantCities_afterBusinessError_requestsAgain() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
             apiService.getMerchantCities()
@@ -220,7 +220,7 @@ class MerchantRepositoryTest {
 
     /** 验证多个并发首次调用共享同一次接口请求，并取得相同的成功数据。 */
     @Test
-    fun `getMerchantCities with concurrent initial calls requests once`() = runTest {
+    fun getMerchantCities_withConcurrentInitialCalls_requestsOnce() = runTest {
         val response = Response.success(
             ApiResponse(
                 code = ApiResponse.CODE_SUCCESS,
