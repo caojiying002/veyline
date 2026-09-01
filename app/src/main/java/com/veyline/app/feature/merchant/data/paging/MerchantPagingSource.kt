@@ -26,6 +26,7 @@ import java.util.logging.Logger
  * 区间稳定，创建 Pager 时必须令 `initialLoadSize` 与 `pageSize` 保持一致。
  *
  * @property apiService 商家 API 服务。
+ * @property merchantSummaryMapper 商家列表 DTO 到领域模型的转换器。
  * @property cityCode 城市筛选代码；`null` 表示不限制城市。
  */
 class MerchantPagingSource(

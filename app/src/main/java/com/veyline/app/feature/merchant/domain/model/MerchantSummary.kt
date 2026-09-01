@@ -11,7 +11,7 @@ package com.veyline.app.feature.merchant.domain.model
  * @property name 经过清理的商家名称。
  * @property cityCode 经过校验的地区代码，用于转换列表展示的地区名称。
  * @property intro 经过清理的商家简介；服务端未提供有效内容时为空字符串。
- * @property coverImagePath 封面图片的相对路径；没有有效路径时为 `null`，不包含图片域名。
+ * @property coverImageUrl 可直接请求的封面图片完整地址；没有有效图片路径时为 `null`。
  */
 data class MerchantSummary(
     val id: String,

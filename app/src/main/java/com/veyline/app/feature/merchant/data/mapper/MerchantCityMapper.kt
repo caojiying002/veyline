@@ -5,9 +5,26 @@ import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
 import com.veyline.app.feature.merchant.domain.model.MerchantCity
 import java.util.logging.Logger
 
+/**
+ * 将商家城市网络模型转换为经过校验、清洗和去重的领域模型。
+ *
+ * 缺少 code 或 name 的城市无法用于筛选，因此会被忽略；如果服务端返回了非空列表，但
+ * 其中没有任何有效城市，则抛出 [InvalidApiDataException]，避免将异常数据误判为正常
+ * 空列表。
+ *
+ * 城市接口一次返回完整数据集合，因此可以在当前输入范围内完成全量去重，并按接口原始
+ * 顺序保留第一个相同 code 的城市。清洗过程只记录数据质量摘要，不输出城市内容。
+ */
 internal object MerchantCityMapper {
 
-    fun map(merchantCityDtos: List<MerchantCityDto>): List<MerchantCity> {
+    /**
+     * 转换商家城市数据，同时过滤无效记录并按规范化后的 code 去重。
+     *
+     * @throws InvalidApiDataException 原始列表非空但没有任何城市可以转换。
+     */
+    fun map(
+        merchantCityDtos: List<MerchantCityDto>,
+    ): List<MerchantCity> {
         val cityCodes = mutableSetOf<String>()
         val merchantCities = ArrayList<MerchantCity>(merchantCityDtos.size)
         var invalidCount = 0
