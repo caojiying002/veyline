@@ -18,9 +18,10 @@ class ImageUrlResolver(
     }
 
     /**
-     * 将非空的相对路径拼接到图片基础地址之后。
+     * 将相对路径拼接到图片基础地址之后。
      *
-     * 路径开头多余的斜杠会被移除，避免最终地址出现重复斜杠。
+     * 会先去掉首尾空白、再去掉开头的斜杠，避免最终地址出现重复斜杠；
+     * 规整后为空则抛出 [IllegalArgumentException]。
      */
     fun resolve(relativePath: String): String {
         val normalizedPath = relativePath.trim().trimStart('/')
