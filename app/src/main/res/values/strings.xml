@@ -12,6 +12,8 @@
     <string name="error_connection">网络连接失败，请检查网络后重试</string>
     <string name="error_technical">出错了，请稍后重试</string>
 
+    <string name="city_select_hint">选择地区</string>
+
     <string name="merchant_city_selection_title">请选择地区</string>
     <string name="merchant_city_empty">暂无城市数据</string>
     <string name="merchant_label">商家</string>

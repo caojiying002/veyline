@@ -11,12 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.veyline.app.R
 import com.veyline.app.ui.theme.*
 
@@ -27,11 +28,13 @@ import com.veyline.app.ui.theme.*
  * 承担页面标题。默认显示“返回”，页面也可以传入更具体的标题。
  *
  * 组件通过 `statusBarsPadding` 自行处理并消费状态栏 Insets，调用方不应再为它重复添加
- * 顶部系统栏间距。组件总高度为 56dp 的标题栏高度（[ToolbarHeight]）加上当前设备的
- * 状态栏 Insets。
+ * 顶部系统栏间距。标题栏内容的最小高度为 [ToolbarHeight]，系统字体放大时允许随内容
+ * 增高；组件总高度还包含当前设备的状态栏 Insets。返回图标以 18sp 转换后的尺寸显示，
+ * 跟随系统字体大小缩放。
  *
  * 组件本身不绘制背景，状态栏和标题栏区域会透出调用方提供的背景。返回区域占满标题栏
- * 高度，包含图标、间距和标题文字；点击时不显示水波纹，通过无障碍点击标签表达返回操作。
+ * 高度，包含图标、间距、标题文字及内边距，右侧剩余空白和状态栏区域不响应返回点击。
+ * 点击时不显示水波纹，通过无障碍点击标签表达返回操作。
  * 过长标题限制为单行并在末尾省略。
  *
  * @param onBackClick 点击返回区域时执行的操作。
@@ -44,34 +47,38 @@ fun AppBackTopBar(
     modifier: Modifier = Modifier,
     title: String = stringResource(R.string.action_back),
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+    // 将 sp 转为布局尺寸，让箭头跟随系统字体大小缩放
+    val iconSize = with(LocalDensity.current) { 18.sp.toDp() }
 
     // 标题栏内容 - 对应原layout中的FrameLayout
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .statusBarsPadding()
-            .height(ToolbarHeight)
+            .statusBarsPadding(),
+        contentAlignment = Alignment.CenterStart,
     ) {
         // 返回按钮 - 对应原layout中的TextView，同时承担标题功能
         Row(
             modifier = Modifier
-                .fillMaxHeight()
+                .heightIn(min = ToolbarHeight)
                 .clickable(
                     indication = null,  // 移除水波纹效果，符合国内APP风格
-                    interactionSource = interactionSource,
+                    interactionSource = remember { MutableInteractionSource() },
                     role = Role.Button,
                     onClickLabel = stringResource(R.string.action_back),
                     onClick = onBackClick,
                 )
-                .padding(horizontal = SpacingLarge),
+                .padding(
+                    horizontal = SpacingLarge,
+                    vertical = SpacingMedium,
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_back),
                 contentDescription = null,
                 tint = VeylineTheme.colors.primary,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(iconSize),
             )
 
             Spacer(modifier = Modifier.width(SpacingMedium))
@@ -90,6 +97,7 @@ fun AppBackTopBar(
 // ===== Preview 组件 =====
 @Preview(name = "默认返回按钮")
 @Preview(name = "默认返回按钮 - 暗色", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "默认返回按钮 - 大字体", fontScale = 2f)
 @Composable
 private fun AppBackTopBarDefaultPreview() {
     VeylineTheme {
@@ -107,30 +115,35 @@ private fun AppBackTopBarDefaultPreview() {
 
 @Preview(name = "自定义返回文字")
 @Preview(name = "自定义返回文字 - 暗色", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "自定义返回文字 - 大字体", fontScale = 2f)
 @Composable
 private fun AppBackTopBarCustomPreview() {
     VeylineTheme {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(VeylineTheme.colors.background),
         ) {
             AppBackTopBar(
-                title = "页面标题",
-                onBackClick = {}
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            AppBackTopBar(
                 title = "个人资料",
                 onBackClick = {}
             )
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(8.dp))
-
+@Preview(name = "长标题")
+@Preview(name = "长标题 - 大字体", fontScale = 2f)
+@Composable
+private fun AppBackTopBarLongTitlePreview() {
+    VeylineTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(VeylineTheme.colors.background),
+        ) {
             AppBackTopBar(
-                title = "设置",
+                title = "用于检查返回图标和长标题省略效果的页面标题",
                 onBackClick = {}
             )
         }
