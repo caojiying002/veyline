@@ -62,7 +62,7 @@ fun MerchantCitySelectionRoute(
 
     MerchantCitySelectionScreen(
         uiState = uiState,
-        onNavigateBack = onNavigateBack,
+        onBackClick = onNavigateBack,
         onRetryClick = {
             viewModel.onAction(MerchantCitySelectionAction.Retry)
         },
@@ -80,14 +80,14 @@ fun MerchantCitySelectionRoute(
  * 处理底部安全区域，确保三键导航和手势导航下的内容均不被遮挡。
  *
  * @param uiState 当前页面状态。
- * @param onNavigateBack 点击标题栏返回区域时执行的操作。
+ * @param onBackClick 点击标题栏返回区域时执行的操作。
  * @param onRetryClick 在全屏错误状态下点击重试按钮时执行的操作。
  * @param modifier 应用于页面根容器的 [Modifier]。
  */
 @Composable
 fun MerchantCitySelectionScreen(
     uiState: MerchantCitySelectionUiState,
-    onNavigateBack: () -> Unit,
+    onBackClick: () -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -102,7 +102,7 @@ fun MerchantCitySelectionScreen(
     ) {
         AppBackTopBar(
             title = stringResource(R.string.merchant_city_selection_title),
-            onBackClick = onNavigateBack,
+            onBackClick = onBackClick,
         )
 
         Box(
@@ -193,7 +193,7 @@ private fun MerchantCitySelectionContentPreview() {
                 isLoading = false,
                 error = null,
             ),
-            onNavigateBack = {},
+            onBackClick = {},
             onRetryClick = {},
         )
     }
@@ -210,7 +210,7 @@ private fun MerchantCitySelectionLoadingPreview() {
                 isLoading = true,
                 error = null,
             ),
-            onNavigateBack = {},
+            onBackClick = {},
             onRetryClick = {},
         )
     }
@@ -227,7 +227,7 @@ private fun MerchantCitySelectionErrorPreview() {
                 isLoading = false,
                 error = UiError.Connection,
             ),
-            onNavigateBack = {},
+            onBackClick = {},
             onRetryClick = {},
         )
     }
@@ -244,7 +244,7 @@ private fun MerchantCitySelectionEmptyPreview() {
                 isLoading = false,
                 error = null,
             ),
-            onNavigateBack = {},
+            onBackClick = {},
             onRetryClick = {},
         )
     }
