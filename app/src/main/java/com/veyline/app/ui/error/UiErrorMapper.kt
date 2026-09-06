@@ -1,6 +1,7 @@
 package com.veyline.app.ui.error
 
 import com.veyline.app.data.network.result.ApiResult
+import com.veyline.app.data.paging.PagingFailureException
 
 /**
  * 将网络调用失败转换为大多数页面可以统一处理的 UI 错误。
@@ -22,3 +23,11 @@ internal fun ApiResult.Failure.toUiError(): UiError =
         is ApiResult.Failure.Serialization,
         is ApiResult.Failure.Unexpected -> UiError.Technical
     }
+
+/**
+ * 将 Paging 适配异常中保存的 API 失败转换为 UI 错误。
+ *
+ * 复用已有的失败分类映射，不重新解析异常原因或生成展示文案。
+ */
+internal fun PagingFailureException.toUiError(): UiError =
+    failure.toUiError()

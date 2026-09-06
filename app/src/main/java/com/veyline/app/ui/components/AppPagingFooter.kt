@@ -81,23 +81,23 @@ fun AppPagingLoadingFooter(
  * 错误提示使用次要文字色，重试提示使用主色，整个底部区域都可点击。
  * 文字居中显示，空间不足时允许换行，高度随内容增长。
  *
- * 组件只接收展示文案和点击回调，不负责异常分类或分页重试逻辑，
+ * 固定显示“加载失败，点击重试”，不支持自定义文案，避免详细错误信息挤占列表底部空间。
+ * 如需解释具体原因，由页面选择合适的方式另行提示。
+ *
+ * 组件只接收点击回调，不负责异常分类或分页重试逻辑，
  * 也不处理背景和系统栏 Insets。
  *
- * @param message 已转换为用户可读文案的错误提示
  * @param onRetryClick 点击底部提示区域时的重试回调
  * @param modifier 应用于整个底部提示区域的 Modifier
  */
 @Composable
 fun AppPagingErrorFooter(
-    message: String,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val retryHint = stringResource(R.string.paging_retry_hint)
     val fullMessage = stringResource(
         R.string.paging_error_with_retry,
-        message,
         retryHint,
     )
 
@@ -166,7 +166,6 @@ private fun AppPagingErrorFooterPreview() {
                 .background(VeylineTheme.colors.background),
         ) {
             AppPagingErrorFooter(
-                message = "加载失败",
                 onRetryClick = {},
             )
         }
