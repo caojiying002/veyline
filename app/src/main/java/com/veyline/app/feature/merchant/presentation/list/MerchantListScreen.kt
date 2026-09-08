@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -85,7 +86,8 @@ fun MerchantListRoute(
  * 固定的简短提示，两处重试均交给 Paging 处理。
  *
  * 标题栏负责顶部状态栏避让，底部和横向系统安全区域由宿主处理。
- * 当前尚未接入下拉刷新，已有内容时的刷新反馈留待后续补充。
+ * 仅在已有列表内容时提供下拉刷新；首次加载、全屏错误和空态不响应下拉操作。
+ * 刷新状态直接由 Paging 驱动，刷新失败时保留已有列表。
  *
  * @param uiState 页面非分页状态，用于展示当前选中的城市
  * @param merchants 分页列表数据及加载状态，页面通过索引访问条目以触发分页预取
@@ -124,38 +126,43 @@ fun MerchantListScreen(
             when {
                 // 已有内容时保留列表，刷新或分页失败不替换整页
                 merchants.itemCount > 0 -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            horizontal = DefaultHorizontalSpace,
-                            vertical = DividerHeight,
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(DividerHeight)
+                    PullToRefreshBox(
+                        isRefreshing = refreshState is LoadState.Loading,
+                        onRefresh = { merchants.refresh() },
+                        modifier = Modifier.fillMaxSize(),
                     ) {
-                        items(
-                            count = merchants.itemCount,
-                            key = merchants.itemKey { it.id },
-                        ) { index ->
-                            val merchant = merchants[index]
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                horizontal = DefaultHorizontalSpace,
+                                vertical = DividerHeight,
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(DividerHeight)
+                        ) {
+                            items(
+                                count = merchants.itemCount,
+                                key = merchants.itemKey { it.id },
+                            ) { index ->
+                                val merchant = merchants[index]
 
-                            if (merchant != null) {
-                                MerchantListItem(
-                                    merchant = merchant,
-                                    onClick = { onMerchantClick(merchant) },
-                                )
+                                if (merchant != null) {
+                                    MerchantListItem(
+                                        merchant = merchant,
+                                        onClick = { onMerchantClick(merchant) },
+                                    )
+                                }
                             }
-                        }
 
-                        // 分页状态只在列表底部展示，不影响已有内容
-                        when (appendState) {
-                            LoadState.Loading -> {
-                                item { AppPagingLoadingFooter() }
+                            // 分页状态只在列表底部展示，不影响已有内容
+                            when (appendState) {
+                                LoadState.Loading -> {
+                                    item { AppPagingLoadingFooter() }
+                                }
+                                is LoadState.Error -> {
+                                    item { AppPagingErrorFooter({ merchants.retry() }) }
+                                }
+                                is LoadState.NotLoading -> Unit
                             }
-                            is LoadState.Error -> {
-                                item { AppPagingErrorFooter({ merchants.retry() }) }
-                            }
-                            is LoadState.NotLoading -> Unit
                         }
                     }
                 }
