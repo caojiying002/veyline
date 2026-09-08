@@ -182,6 +182,9 @@ fun MerchantListScreen(
                         message = stringResource(R.string.merchant_list_empty),
                     )
                 }
+
+                // 尚未触发首次加载，保持内容区域空白
+                else -> Unit
             }
         }
     }
