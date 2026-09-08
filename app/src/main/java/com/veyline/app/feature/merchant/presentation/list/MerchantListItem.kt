@@ -1,6 +1,7 @@
 package com.veyline.app.feature.merchant.presentation.list
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.veyline.app.R
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
@@ -82,6 +85,7 @@ fun MerchantListItem(
                 MerchantCover(
                     imageModel = imageUrl,
                     merchantName = merchant.name,
+                    modifier = Modifier.align(Alignment.CenterVertically),
                 )
             }
         }
@@ -130,6 +134,9 @@ private fun MerchantMetadataRow(
     cityCode: String,
     modifier: Modifier = Modifier,
 ) {
+    // 地区图标跟随系统字体大小缩放，与同一行文字保持相对比例
+    val iconSize = with(LocalDensity.current) { 16.sp.toDp() }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -139,7 +146,7 @@ private fun MerchantMetadataRow(
             painter = painterResource(R.drawable.ic_location),
             contentDescription = null,
             tint = VeylineTheme.colors.primary,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(iconSize),
         )
         Spacer(modifier = Modifier.width(SpacingSmall))
         Text(
