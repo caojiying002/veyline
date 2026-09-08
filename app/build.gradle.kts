@@ -143,6 +143,11 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // Compose 页面导航
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
     // Kotlin 协程与序列化
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
