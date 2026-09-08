@@ -36,19 +36,24 @@ import com.veyline.app.ui.theme.VeylineTheme
 private const val VIEW_MODEL_KEY = "merchant:province_selection"
 
 /**
- * 商家城市选择页面的有状态入口。
+ * 商家省份选择页面的有状态入口。
  *
  * 负责获取 Hilt 管理的 ViewModel、以生命周期感知的方式收集页面状态，并将首次加载和
- * 重试操作转交给 ViewModel。页面使用固定的专属 key，避免同一个 ViewModelStoreOwner
- * 下的其他页面意外复用该 ViewModel 实例。
+ * 重试操作转交给 ViewModel。用户点击省份后，选择结果继续向上传给导航层，
+ * Route 本身不保存筛选状态，也不直接操作导航栈。
+ *
+ * 页面使用固定的专属 key，避免同一个 ViewModelStoreOwner 下的其他页面意外复用
+ * 该 ViewModel 实例。
  *
  * @param onNavigateBack 请求返回上一页时执行的导航操作。
+ * @param onProvinceSelected 用户选中省份时执行的回调，参数为当前选中的省份。
  * @param modifier 传递给无状态页面根容器的 [Modifier]。
- * @param viewModel 商家城市选择页面的 ViewModel，默认由 Hilt 提供。
+ * @param viewModel 商家省份选择页面的 ViewModel，默认由 Hilt 提供。
  */
 @Composable
 fun MerchantProvinceSelectionRoute(
     onNavigateBack: () -> Unit,
+    onProvinceSelected: (MerchantProvince) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MerchantProvinceSelectionViewModel = hiltViewModel(
         key = VIEW_MODEL_KEY,
@@ -63,6 +68,7 @@ fun MerchantProvinceSelectionRoute(
     MerchantProvinceSelectionScreen(
         uiState = uiState,
         onBackClick = onNavigateBack,
+        onProvinceClick = onProvinceSelected,
         onRetryClick = {
             viewModel.onAction(MerchantProvinceSelectionAction.Retry)
         },
@@ -71,9 +77,9 @@ fun MerchantProvinceSelectionRoute(
 }
 
 /**
- * 商家城市选择页面的无状态 UI。
+ * 商家省份选择页面的无状态 UI。
  *
- * 页面根据 [uiState] 展示全屏加载、全屏错误、空数据或城市列表。已有城市内容时始终保留
+ * 页面根据 [uiState] 展示全屏加载、全屏错误、空数据或省份列表。已有省份内容时始终保留
  * 列表，不使用全屏状态覆盖，便于后续扩展刷新和分页状态。
  *
  * 标题栏负责处理顶部状态栏 Insets；页面主体分别为不可滚动状态内容和 [LazyColumn]
@@ -81,6 +87,7 @@ fun MerchantProvinceSelectionRoute(
  *
  * @param uiState 当前页面状态。
  * @param onBackClick 点击标题栏返回区域时执行的操作。
+ * @param onProvinceClick 点击省份列表项时执行的操作，参数为当前省份。
  * @param onRetryClick 在全屏错误状态下点击重试按钮时执行的操作。
  * @param modifier 应用于页面根容器的 [Modifier]。
  */
@@ -88,6 +95,7 @@ fun MerchantProvinceSelectionRoute(
 fun MerchantProvinceSelectionScreen(
     uiState: MerchantProvinceSelectionUiState,
     onBackClick: () -> Unit,
+    onProvinceClick: (MerchantProvince) -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -153,6 +161,7 @@ fun MerchantProvinceSelectionScreen(
                         ) { index, province ->
                             CitySelectionListItem(
                                 cityName = province.name,
+                                onClick = { onProvinceClick(province) },
                             )
 
                             if (index < uiState.provinces.lastIndex) {
@@ -194,6 +203,7 @@ private fun MerchantProvinceSelectionContentPreview() {
                 error = null,
             ),
             onBackClick = {},
+            onProvinceClick = {},
             onRetryClick = {},
         )
     }
@@ -211,6 +221,7 @@ private fun MerchantProvinceSelectionLoadingPreview() {
                 error = null,
             ),
             onBackClick = {},
+            onProvinceClick = {},
             onRetryClick = {},
         )
     }
@@ -228,6 +239,7 @@ private fun MerchantProvinceSelectionErrorPreview() {
                 error = UiError.Connection,
             ),
             onBackClick = {},
+            onProvinceClick = {},
             onRetryClick = {},
         )
     }
@@ -245,6 +257,7 @@ private fun MerchantProvinceSelectionEmptyPreview() {
                 error = null,
             ),
             onBackClick = {},
+            onProvinceClick = {},
             onRetryClick = {},
         )
     }

@@ -2,6 +2,7 @@ package com.veyline.app.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,11 +33,13 @@ private val dividerThickness = 0.75.dp
 @Composable
 fun CitySelectionListItem(
     cityName: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .background(VeylineTheme.colors.surface)
             .padding(
                 horizontal = DefaultHorizontalSpace,
@@ -81,9 +84,9 @@ private fun CitySelectionListItemPreview() {
                 .fillMaxWidth()
                 .background(VeylineTheme.colors.background),
         ) {
-            CitySelectionListItem(cityName = "北京市")
+            CitySelectionListItem(cityName = "北京市", onClick = {})
             CitySelectionListDivider()
-            CitySelectionListItem(cityName = "新疆维吾尔自治区")
+            CitySelectionListItem(cityName = "新疆维吾尔自治区", onClick = {})
         }
     }
 }
