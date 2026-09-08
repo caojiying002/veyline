@@ -8,7 +8,7 @@ package com.veyline.app.feature.merchant.domain.model
  * @property code 城市的业务标识。
  * @property name 向用户展示的城市名称。
  */
-data class MerchantCity(
+data class MerchantProvince(
     val code: String,
     val name: String,
 )

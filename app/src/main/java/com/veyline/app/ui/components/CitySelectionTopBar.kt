@@ -76,7 +76,7 @@ fun CitySelectionTopBar(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     role = Role.Button,
-                    onClickLabel = stringResource(R.string.city_select_hint),
+                    onClickLabel = stringResource(R.string.city_selection_hint),
                     onClick = onCitySelectionClick,
                 )
                 // 内边距也属于点击区域，方便触摸文字和箭头周围的位置
@@ -88,7 +88,7 @@ fun CitySelectionTopBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = cityName ?: stringResource(R.string.city_select_hint),
+                text = cityName ?: stringResource(R.string.city_selection_hint),
                 style = VeylineTextStyles.Title,
                 color = VeylineTheme.colors.primary,
                 maxLines = 1,

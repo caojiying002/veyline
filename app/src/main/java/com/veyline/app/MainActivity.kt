@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                         ),
                 ) {
                     MerchantListRoute(
-                        onNavigateToCitySelection = {
+                        onNavigateToProvinceSelection = {
                             // TODO 接入城市选择导航
                         },
                         onNavigateToMerchantDetail = { _ ->

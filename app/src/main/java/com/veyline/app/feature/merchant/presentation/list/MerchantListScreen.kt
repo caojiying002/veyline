@@ -43,14 +43,14 @@ private const val VIEW_MODEL_KEY = "merchant:list"
  * 负责获取 ViewModel、收集页面状态和分页数据，并连接外部导航回调。
  * 当前进入组合时即视为页面可见，首次加载由 ViewModel 保证幂等。
  *
- * @param onNavigateToCitySelection 打开城市选择页面
+ * @param onNavigateToProvinceSelection 打开地区选择页面
  * @param onNavigateToMerchantDetail 根据商家 ID 打开详情页面
  * @param modifier 传递给页面根布局的 Modifier
  * @param viewModel 商家列表 ViewModel，默认由 Hilt 提供
  */
 @Composable
 fun MerchantListRoute(
-    onNavigateToCitySelection: () -> Unit,
+    onNavigateToProvinceSelection: () -> Unit,
     onNavigateToMerchantDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MerchantListViewModel = hiltViewModel(
@@ -67,7 +67,7 @@ fun MerchantListRoute(
     MerchantListScreen(
         uiState = uiState,
         merchants = merchants,
-        onCitySelectionClick = onNavigateToCitySelection,
+        onProvinceSelectionClick = onNavigateToProvinceSelection,
         onMerchantClick = { merchant ->
             onNavigateToMerchantDetail(merchant.id)
         },
@@ -91,7 +91,7 @@ fun MerchantListRoute(
  *
  * @param uiState 页面非分页状态，用于展示当前选中的城市
  * @param merchants 分页列表数据及加载状态，页面通过索引访问条目以触发分页预取
- * @param onCitySelectionClick 点击城市选择区域时的回调
+ * @param onProvinceSelectionClick 点击地区选择区域时的回调
  * @param onMerchantClick 点击商家列表项时的回调，参数为当前商家
  * @param modifier 应用于页面根布局的 Modifier
  */
@@ -99,7 +99,7 @@ fun MerchantListRoute(
 fun MerchantListScreen(
     uiState: MerchantListUiState,
     merchants: LazyPagingItems<MerchantSummary>,
-    onCitySelectionClick: () -> Unit,
+    onProvinceSelectionClick: () -> Unit,
     onMerchantClick: (MerchantSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -108,10 +108,10 @@ fun MerchantListScreen(
             .fillMaxSize()
             .background(VeylineTheme.colors.background),
     ) {
-        // 标题栏负责顶部状态栏避让
+        // 标题栏负责顶部状态栏 Insets
         CitySelectionTopBar(
-            cityName = uiState.selectedCity?.name,
-            onCitySelectionClick = onCitySelectionClick,
+            cityName = uiState.selectedProvince?.name,
+            onCitySelectionClick = onProvinceSelectionClick,
         )
 
         // 后续在这里接入列表及加载、错误、空状态

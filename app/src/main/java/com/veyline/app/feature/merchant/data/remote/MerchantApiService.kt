@@ -2,7 +2,7 @@ package com.veyline.app.feature.merchant.data.remote
 
 import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
-import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
+import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
 import retrofit2.Response
 import retrofit2.http.GET
@@ -17,12 +17,12 @@ import retrofit2.http.Query
 interface MerchantApiService {
 
     /**
-     * 获取可用于筛选商家列表的城市。
+     * 获取可用于筛选商家列表的地区。
      *
      * @return 包含商家城市网络模型列表的通用 API 响应。
      */
     @GET("config/merchantCity.json")
-    suspend fun getMerchantCities(): Response<ApiResponseDto<List<MerchantCityDto>>>
+    suspend fun getMerchantProvinces(): Response<ApiResponseDto<List<MerchantProvinceDto>>>
 
     /**
      * 按城市获取商家摘要分页数据。

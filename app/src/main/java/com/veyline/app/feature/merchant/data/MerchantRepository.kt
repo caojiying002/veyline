@@ -6,12 +6,12 @@ import androidx.paging.PagingData
 import com.veyline.app.data.network.apiCall
 import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.result.ApiResult
-import com.veyline.app.feature.merchant.data.mapper.MerchantCityMapper
+import com.veyline.app.feature.merchant.data.mapper.MerchantProvinceMapper
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.paging.MerchantPagingSource
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
-import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
-import com.veyline.app.feature.merchant.domain.model.MerchantCity
+import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
+import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
@@ -36,10 +36,10 @@ class MerchantRepository @Inject constructor(
 ) {
 
     /** 同步缓存访问，并避免多个首次调用同时发起相同的城市列表请求。 */
-    private val cityCacheMutex = Mutex()
+    private val provinceCacheMutex = Mutex()
 
     /** 已成功转换的进程内缓存；`null` 表示尚未成功加载，空列表表示已成功加载但没有数据。 */
-    private var cachedCities: List<MerchantCity>? = null
+    private var cachedProvinces: List<MerchantProvince>? = null
 
     /**
      * 创建按城市筛选的商家列表分页流。
@@ -80,24 +80,24 @@ class MerchantRepository @Inject constructor(
     }
 
     /**
-     * 获取可用于商家筛选的城市列表。
+     * 获取可用于商家筛选的地区列表。
      *
      * 缓存命中时直接返回；缓存未命中时，在互斥区内完成网络请求、数据校验与缓存写入，
      * 从而让并发调用复用第一次成功加载的结果。
      */
-    suspend fun getMerchantCities(): ApiResult<List<MerchantCity>> =
-        cityCacheMutex.withLock {
-            cachedCities?.let { cities ->
-                return@withLock ApiResult.Success(cities)
+    suspend fun getMerchantProvinces(): ApiResult<List<MerchantProvince>> =
+        provinceCacheMutex.withLock {
+            cachedProvinces?.let { provinces ->
+                return@withLock ApiResult.Success(provinces)
             }
 
-            when (val result = apiCall { apiService.getMerchantCities() }) {
+            when (val result = apiCall { apiService.getMerchantProvinces() }) {
                 is ApiResult.Success -> {
-                    val mappedResult = mapCities(result.data)
+                    val mappedResult = mapProvinces(result.data)
 
                     // 空城市列表不写入缓存，使页面后续加载时能够重新请求并自行恢复。
                     if (mappedResult is ApiResult.Success && mappedResult.data.isNotEmpty()) {
-                        cachedCities = mappedResult.data
+                        cachedProvinces = mappedResult.data
                     }
 
                     mappedResult
@@ -108,11 +108,11 @@ class MerchantRepository @Inject constructor(
         }
 
     /** 将网络模型转换为领域模型，并把已知的数据协议异常转换为稳定的失败结果。 */
-    private fun mapCities(
-        cities: List<MerchantCityDto>,
-    ): ApiResult<List<MerchantCity>> =
+    private fun mapProvinces(
+        provinceDtos: List<MerchantProvinceDto>,
+    ): ApiResult<List<MerchantProvince>> =
         try {
-            ApiResult.Success(MerchantCityMapper.map(cities))
+            ApiResult.Success(MerchantProvinceMapper.map(provinceDtos))
         } catch (exception: InvalidApiDataException) {
             ApiResult.Failure.Serialization(exception)
         }

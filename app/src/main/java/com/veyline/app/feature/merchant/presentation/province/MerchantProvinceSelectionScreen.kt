@@ -1,4 +1,4 @@
-package com.veyline.app.feature.merchant.presentation.city
+package com.veyline.app.feature.merchant.presentation.province
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.veyline.app.R
-import com.veyline.app.feature.merchant.domain.model.MerchantCity
+import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.ui.components.AppBackTopBar
 import com.veyline.app.ui.components.AppEmptyContent
 import com.veyline.app.ui.components.AppErrorContent
@@ -33,7 +33,7 @@ import com.veyline.app.ui.components.CitySelectionListItem
 import com.veyline.app.ui.error.UiError
 import com.veyline.app.ui.theme.VeylineTheme
 
-private const val VIEW_MODEL_KEY = "merchant:city_selection"
+private const val VIEW_MODEL_KEY = "merchant:province_selection"
 
 /**
  * 商家城市选择页面的有状态入口。
@@ -47,24 +47,24 @@ private const val VIEW_MODEL_KEY = "merchant:city_selection"
  * @param viewModel 商家城市选择页面的 ViewModel，默认由 Hilt 提供。
  */
 @Composable
-fun MerchantCitySelectionRoute(
+fun MerchantProvinceSelectionRoute(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MerchantCitySelectionViewModel = hiltViewModel(
+    viewModel: MerchantProvinceSelectionViewModel = hiltViewModel(
         key = VIEW_MODEL_KEY,
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel) {
-        viewModel.onAction(MerchantCitySelectionAction.InitialLoad)
+        viewModel.onAction(MerchantProvinceSelectionAction.InitialLoad)
     }
 
-    MerchantCitySelectionScreen(
+    MerchantProvinceSelectionScreen(
         uiState = uiState,
         onBackClick = onNavigateBack,
         onRetryClick = {
-            viewModel.onAction(MerchantCitySelectionAction.Retry)
+            viewModel.onAction(MerchantProvinceSelectionAction.Retry)
         },
         modifier = modifier,
     )
@@ -85,8 +85,8 @@ fun MerchantCitySelectionRoute(
  * @param modifier 应用于页面根容器的 [Modifier]。
  */
 @Composable
-fun MerchantCitySelectionScreen(
-    uiState: MerchantCitySelectionUiState,
+fun MerchantProvinceSelectionScreen(
+    uiState: MerchantProvinceSelectionUiState,
     onBackClick: () -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -101,7 +101,7 @@ fun MerchantCitySelectionScreen(
             .background(VeylineTheme.colors.background),
     ) {
         AppBackTopBar(
-            title = stringResource(R.string.merchant_city_selection_title),
+            title = stringResource(R.string.city_selection_title),
             onBackClick = onBackClick,
         )
 
@@ -136,7 +136,7 @@ fun MerchantCitySelectionScreen(
                 // 已排除加载和错误，剩余的无内容情况即为空状态
                 !uiState.hasContent -> {
                     AppEmptyContent(
-                        message = stringResource(R.string.merchant_city_empty),
+                        message = stringResource(R.string.merchant_province_empty),
                         modifier = Modifier.windowInsetsPadding(bottomInsets),
                     )
                 }
@@ -148,14 +148,14 @@ fun MerchantCitySelectionScreen(
                         contentPadding = bottomInsets.asPaddingValues(),
                     ) {
                         itemsIndexed(
-                            items = uiState.cities,
-                            key = { _, city -> city.code },
-                        ) { index, city ->
+                            items = uiState.provinces,
+                            key = { _, province -> province.code },
+                        ) { index, province ->
                             CitySelectionListItem(
-                                cityName = city.name,
+                                cityName = province.name,
                             )
 
-                            if (index < uiState.cities.lastIndex) {
+                            if (index < uiState.provinces.lastIndex) {
                                 CitySelectionListDivider()
                             }
                         }
@@ -167,29 +167,29 @@ fun MerchantCitySelectionScreen(
 }
 
 // ===== Preview 组件 =====
-@Preview(name = "城市列表", showSystemUi = true)
-@Preview(name = "城市列表 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "商家省份列表", showSystemUi = true)
+@Preview(name = "商家省份列表 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun MerchantCitySelectionContentPreview() {
+private fun MerchantProvinceSelectionContentPreview() {
     val cities = listOf(
-        MerchantCity(
+        MerchantProvince(
             code = "110000",
             name = "北京市",
         ),
-        MerchantCity(
+        MerchantProvince(
             code = "310000",
             name = "上海市",
         ),
-        MerchantCity(
+        MerchantProvince(
             code = "650000",
             name = "新疆维吾尔自治区",
         ),
     )
 
     VeylineTheme {
-        MerchantCitySelectionScreen(
-            uiState = MerchantCitySelectionUiState(
-                cities = cities,
+        MerchantProvinceSelectionScreen(
+            uiState = MerchantProvinceSelectionUiState(
+                provinces = cities,
                 isLoading = false,
                 error = null,
             ),
@@ -202,11 +202,11 @@ private fun MerchantCitySelectionContentPreview() {
 @Preview(name = "加载状态", showSystemUi = true)
 @Preview(name = "加载状态 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun MerchantCitySelectionLoadingPreview() {
+private fun MerchantProvinceSelectionLoadingPreview() {
     VeylineTheme {
-        MerchantCitySelectionScreen(
-            uiState = MerchantCitySelectionUiState(
-                cities = emptyList(),
+        MerchantProvinceSelectionScreen(
+            uiState = MerchantProvinceSelectionUiState(
+                provinces = emptyList(),
                 isLoading = true,
                 error = null,
             ),
@@ -219,11 +219,11 @@ private fun MerchantCitySelectionLoadingPreview() {
 @Preview(name = "错误状态", showSystemUi = true)
 @Preview(name = "错误状态 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun MerchantCitySelectionErrorPreview() {
+private fun MerchantProvinceSelectionErrorPreview() {
     VeylineTheme {
-        MerchantCitySelectionScreen(
-            uiState = MerchantCitySelectionUiState(
-                cities = emptyList(),
+        MerchantProvinceSelectionScreen(
+            uiState = MerchantProvinceSelectionUiState(
+                provinces = emptyList(),
                 isLoading = false,
                 error = UiError.Connection,
             ),
@@ -236,11 +236,11 @@ private fun MerchantCitySelectionErrorPreview() {
 @Preview(name = "空状态", showSystemUi = true)
 @Preview(name = "空状态 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun MerchantCitySelectionEmptyPreview() {
+private fun MerchantProvinceSelectionEmptyPreview() {
     VeylineTheme {
-        MerchantCitySelectionScreen(
-            uiState = MerchantCitySelectionUiState(
-                cities = emptyList(),
+        MerchantProvinceSelectionScreen(
+            uiState = MerchantProvinceSelectionUiState(
+                provinces = emptyList(),
                 isLoading = false,
                 error = null,
             ),

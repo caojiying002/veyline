@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.veyline.app.feature.merchant.data.MerchantRepository
-import com.veyline.app.feature.merchant.domain.model.MerchantCity
+import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,14 +29,14 @@ import javax.inject.Inject
  * 加载中、错误、重试、末页等分页状态由 UI 层通过 Paging 的 `CombinedLoadStates` 观察，
  * 同样不在这里维护。
  *
- * @property selectedCity 当前选中的筛选城市；`null` 表示不限制城市、查询全部。
+ * @property selectedProvince 当前选中的筛选地区；`null` 表示不限制地区、查询全部。
  */
 data class MerchantListUiState(
-    val selectedCity: MerchantCity? = null,
+    val selectedProvince: MerchantProvince? = null,
 ) {
-    /** 当前是否限制为具体城市；`false` 表示查询全部城市。 */
-    val hasCityFilter: Boolean
-        get() = selectedCity != null
+    /** 当前是否限制为具体地区；`false` 表示查询全部地区。 */
+    val hasProvinceFilter: Boolean
+        get() = selectedProvince != null
 }
 
 /**
@@ -45,7 +45,7 @@ data class MerchantListUiState(
  * [InitialLoad] 由 UI 在页面首次可见时发送，并在同一个 ViewModel 实例内保证幂等：只有
  * 收到该操作后，[MerchantListViewModel.merchants] 才会真正向 Repository 请求分页数据。
  *
- * [SelectCity] 与 [SelectAllCities] 用于切换城市筛选，允许在 [InitialLoad] 之前发送；
+ * [SelectProvince] 与 [SelectAllCities] 用于切换地区筛选，允许在 [InitialLoad] 之前发送；
  * 此时只更新筛选条件，等首次加载被触发时再据此发起首个请求。
  */
 sealed interface MerchantListAction {
@@ -54,30 +54,30 @@ sealed interface MerchantListAction {
     data object InitialLoad : MerchantListAction
 
     /**
-     * 清除具体城市筛选并查询全部城市。
+     * 清除具体地区筛选并查询全部地区。
      *
-     * 使用独立 Action，而不是允许 [SelectCity] 接收 `null`，使调用方能够直接表达用户操作，
+     * 使用独立 Action，而不是允许 [SelectProvince] 接收 `null`，使调用方能够直接表达用户操作，
      * 也避免把“全部城市”与缺少参数混为一谈。
      */
-    data object SelectAllCities : MerchantListAction
+    data object SelectAllProvinces : MerchantListAction
 
     /**
-     * 将商家列表筛选为指定城市。
+     * 将商家列表筛选为指定地区。
      *
-     * @property city 用户选中的城市；与当前选中城市相同时不会触发重新加载。
+     * @property province 用户选中的地区；与当前选中地区相同时不会触发重新加载。
      */
-    data class SelectCity(
-        val city: MerchantCity,
+    data class SelectProvince(
+        val province: MerchantProvince,
     ) : MerchantListAction
 }
 
 /**
- * 管理商家列表的分页加载触发时机与城市筛选状态。
+ * 管理商家列表的分页加载触发时机与地区筛选状态。
  *
  * 与城市选择页不同，本页的列表数据完全交给 Paging 3，ViewModel 只承担两件事：
  * 1. 控制「首次加载」的触发时机——页面首次可见时，而不是 ViewModel 创建或 [merchants]
  *    被订阅时；
- * 2. 维护城市筛选条件，并在筛选变化时切换到新的分页数据源。
+ * 2. 维护地区筛选条件，并在筛选变化时切换到新的分页数据源。
  *
  * 列表的加载中 / 错误 / 重试 / 末页等状态由 UI 层通过 Paging 的 `CombinedLoadStates`
  * 观察，不在 [uiState] 中重复维护。
@@ -96,7 +96,7 @@ class MerchantListViewModel @Inject constructor(
      */
     private var hasRequestedInitialLoad = false
 
-    // TODO 后续实现城市选择之后可能会改变这里的加载控制逻辑，但仍然要受“页面首次可见时”这一条件的制约
+    // TODO 后续实现地区选择之后可能会改变这里的加载控制逻辑，但仍然要受“页面首次可见时”这一条件的制约
 
     /**
      * 「页面首次可见」信号。在收到第一个元素之前，[merchants] 不会向 Repository 发起任何请求。
@@ -115,9 +115,9 @@ class MerchantListViewModel @Inject constructor(
      *
      * 管道分三段：
      * 1. [initialLoadSignal]：在收到首次可见信号前不进入下游，页面因此不会“进入即加载”。
-     * 2. 观察 [uiState] 中的城市代码并 [distinctUntilChanged]：无关的状态变化、或重复选中
-     *    同一城市都不会重建数据源。
-     * 3. 每个不同的城市代码用 `flatMapLatest` 切换到 [MerchantRepository.getMerchants] 新建的
+     * 2. 观察 [uiState] 中的地区代码并 [distinctUntilChanged]：无关的状态变化、或重复选中
+     *    同一地区都不会重建数据源。
+     * 3. 每个不同的地区代码用 `flatMapLatest` 切换到 [MerchantRepository.getMerchants] 新建的
      *    分页流，切换筛选时自动取消上一个数据源。
      *
      * `cachedIn(viewModelScope)` 必须是最后一个操作符：它把 [PagingData] 缓存在 ViewModel
@@ -127,7 +127,7 @@ class MerchantListViewModel @Inject constructor(
     val merchants: Flow<PagingData<MerchantSummary>> =
         initialLoadSignal.flatMapLatest {
             uiState
-                .map { it.selectedCity?.code }
+                .map { it.selectedProvince?.code }
                 .distinctUntilChanged()
                 .flatMapLatest { cityCode ->
                     merchantRepository.getMerchants(cityCode)
@@ -138,8 +138,8 @@ class MerchantListViewModel @Inject constructor(
     fun onAction(action: MerchantListAction) {
         when (action) {
             MerchantListAction.InitialLoad -> requestInitialLoad()
-            MerchantListAction.SelectAllCities -> selectAllCities()
-            is MerchantListAction.SelectCity -> selectCity(action.city)
+            MerchantListAction.SelectAllProvinces -> selectAllProvinces()
+            is MerchantListAction.SelectProvince -> selectProvince(action.province)
         }
     }
 
@@ -153,24 +153,24 @@ class MerchantListViewModel @Inject constructor(
         initialLoadSignal.tryEmit(Unit)
     }
 
-    private fun selectAllCities() {
+    private fun selectAllProvinces() {
         _uiState.update { currentState ->
             // 已是“全部城市”时返回原状态，省去一次 copy 分配（StateFlow 本身也会按值去重）
-            if (currentState.selectedCity == null) {
+            if (currentState.selectedProvince == null) {
                 currentState
             } else {
-                currentState.copy(selectedCity = null)
+                currentState.copy(selectedProvince = null)
             }
         }
     }
 
-    private fun selectCity(city: MerchantCity) {
+    private fun selectProvince(province: MerchantProvince) {
         _uiState.update { currentState ->
-            // 选中的仍是当前城市时返回原状态，省去一次 copy 分配（StateFlow 本身也会按值去重）
-            if (currentState.selectedCity == city) {
+            // 选中的仍是当前地区时返回原状态，省去一次 copy 分配（StateFlow 本身也会按值去重）
+            if (currentState.selectedProvince == province) {
                 currentState
             } else {
-                currentState.copy(selectedCity = city)
+                currentState.copy(selectedProvince = province)
             }
         }
     }

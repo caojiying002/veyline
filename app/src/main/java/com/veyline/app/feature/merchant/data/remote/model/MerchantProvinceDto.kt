@@ -12,7 +12,7 @@ import com.squareup.moshi.JsonClass
  * @property name 服务端返回的城市名称。
  */
 @JsonClass(generateAdapter = true)
-data class MerchantCityDto(
+data class MerchantProvinceDto(
     val code: String?,
     val name: String?,
 )
