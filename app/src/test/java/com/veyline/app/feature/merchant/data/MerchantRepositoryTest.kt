@@ -8,9 +8,9 @@ import com.veyline.app.data.network.model.PagedDataDto
 import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
-import com.veyline.app.feature.merchant.data.remote.model.MerchantCityDto
+import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
-import com.veyline.app.feature.merchant.domain.model.MerchantCity
+import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -25,9 +25,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 /**
- * 验证 [MerchantRepository] 对商家分页数据和城市筛选数据的组织边界。
+ * 验证 [MerchantRepository] 对商家分页数据和地区筛选数据的组织边界。
  *
- * 商家分页测试关注 Pager 的首次加载配置、筛选参数规范化以及向上层暴露的领域模型；城市
+ * 商家分页测试关注 Pager 的首次加载配置、筛选参数规范化以及向上层暴露的领域模型；地区
  * 列表测试关注网络结果转换，以及成功、空数据和失败结果对应的进程内缓存行为。Mapper 和
  * PagingSource 内部的具体字段校验、分页键计算与去重规则由各自的独立测试覆盖。
  */
@@ -37,9 +37,9 @@ class MerchantRepositoryTest {
         imageUrlResolver = ImageUrlResolver(TEST_IMAGE_BASE_URL),
     )
 
-    /** 验证商家分页首次加载使用固定页大小，并规范化城市筛选代码。 */
+    /** 验证商家分页首次加载使用固定页大小，并规范化地区筛选代码。 */
     @Test
-    fun getMerchants_onFirstLoad_usesPagingConfigAndNormalizedCityCode() = runTest {
+    fun getMerchants_onFirstLoad_usesPagingConfigAndNormalizedProvinceCode() = runTest {
         val merchantDto = MerchantSummaryDto(
             id = "merchant-a",
             name = "商家甲",
@@ -71,7 +71,7 @@ class MerchantRepositoryTest {
         val repository = createRepository(apiService)
 
         val merchants = repository
-            .getMerchants(cityCode = "  city-a  ") // 验证 Repository 会清理城市代码两侧的空白
+            .getMerchants(cityCode = "  city-a  ") // 验证 Repository 会清理地区代码两侧的空白
             .asSnapshot() // 收集 PagingData 当前加载结果，并转换为便于断言的普通 List
 
         val expected = listOf(
@@ -88,18 +88,18 @@ class MerchantRepositoryTest {
 
     /** 验证成功加载后复用进程内缓存，不重复请求接口。 */
     @Test
-    fun getMerchantCities_afterSuccessfulResponse_usesCache() = runTest {
+    fun getMerchantProvinces_afterSuccessfulResponse_usesCache() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         } returns Response.success(
             ApiResponseDto(
                 code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = listOf(
-                    MerchantCityDto(
+                    MerchantProvinceDto(
                         code = "code-a",
-                        name = "城市甲",
+                        name = "省份甲",
                     ),
                 ),
             ),
@@ -108,28 +108,28 @@ class MerchantRepositoryTest {
 
         val expected = ApiResult.Success(
             listOf(
-                MerchantCity(
+                MerchantProvince(
                     code = "code-a",
-                    name = "城市甲",
+                    name = "省份甲",
                 ),
             ),
         )
-        val firstResult = repository.getMerchantCities()
-        val secondResult = repository.getMerchantCities()
+        val firstResult = repository.getMerchantProvinces()
+        val secondResult = repository.getMerchantProvinces()
 
         assertEquals(expected, firstResult)
         assertEquals(expected, secondResult)
         coVerify(exactly = 1) {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         }
     }
 
     /** 验证成功返回空列表时不写入缓存，使后续调用能够重新请求。 */
     @Test
-    fun getMerchantCities_afterEmptySuccessfulResponse_requestsAgain() = runTest {
+    fun getMerchantProvinces_afterEmptySuccessfulResponse_requestsAgain() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         } returns Response.success(
             ApiResponseDto(
                 code = ApiResponseDto.CODE_SUCCESS,
@@ -139,33 +139,33 @@ class MerchantRepositoryTest {
         )
         val repository = createRepository(apiService)
 
-        val expected = ApiResult.Success(emptyList<MerchantCity>())
-        val firstResult = repository.getMerchantCities()
-        val secondResult = repository.getMerchantCities()
+        val expected = ApiResult.Success(emptyList<MerchantProvince>())
+        val firstResult = repository.getMerchantProvinces()
+        val secondResult = repository.getMerchantProvinces()
 
         assertEquals(expected, firstResult)
         assertEquals(expected, secondResult)
         coVerify(exactly = 2) {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         }
     }
 
-    /** 验证城市数据全部无效时不写入缓存，后续调用仍会重新请求。 */
+    /** 验证地区数据全部无效时不写入缓存，后续调用仍会重新请求。 */
     @Test
-    fun getMerchantCities_afterInvalidData_requestsAgain() = runTest {
+    fun getMerchantProvinces_afterInvalidData_requestsAgain() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         } returns Response.success(
             ApiResponseDto(
                 code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = listOf(
-                    MerchantCityDto(
+                    MerchantProvinceDto(
                         code = null,
-                        name = "城市甲",
+                        name = "省份甲",
                     ),
-                    MerchantCityDto(
+                    MerchantProvinceDto(
                         code = "code-b",
                         name = "   ",
                     ),
@@ -174,8 +174,8 @@ class MerchantRepositoryTest {
         )
         val repository = createRepository(apiService)
 
-        val firstResult = repository.getMerchantCities()
-        val secondResult = repository.getMerchantCities()
+        val firstResult = repository.getMerchantProvinces()
+        val secondResult = repository.getMerchantProvinces()
 
         assertIs<ApiResult.Failure.Serialization>(firstResult)
         assertIs<InvalidApiDataException>(firstResult.exception)
@@ -185,16 +185,16 @@ class MerchantRepositoryTest {
 
         // 两次调用都重新请求接口，说明转换失败的结果没有写入缓存
         coVerify(exactly = 2) {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         }
     }
 
     /** 验证业务失败不写入缓存，后续调用仍会重新请求接口。 */
     @Test
-    fun getMerchantCities_afterBusinessError_requestsAgain() = runTest {
+    fun getMerchantProvinces_afterBusinessError_requestsAgain() = runTest {
         val apiService = mockk<MerchantApiService>()
         coEvery {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         } returns Response.success(
             ApiResponseDto(
                 code = 1000,
@@ -208,27 +208,27 @@ class MerchantRepositoryTest {
             code = 1000,
             message = "business failed",
         )
-        val firstResult = repository.getMerchantCities()
-        val secondResult = repository.getMerchantCities()
+        val firstResult = repository.getMerchantProvinces()
+        val secondResult = repository.getMerchantProvinces()
 
         assertEquals(expected, firstResult)
         assertEquals(expected, secondResult)
         coVerify(exactly = 2) {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         }
     }
 
     /** 验证多个并发首次调用共享同一次接口请求，并取得相同的成功数据。 */
     @Test
-    fun getMerchantCities_withConcurrentInitialCalls_requestsOnce() = runTest {
+    fun getMerchantProvinces_withConcurrentInitialCalls_requestsOnce() = runTest {
         val response = Response.success(
             ApiResponseDto(
                 code = ApiResponseDto.CODE_SUCCESS,
                 msg = "success",
                 data = listOf(
-                    MerchantCityDto(
+                    MerchantProvinceDto(
                         code = "code-a",
-                        name = "城市甲",
+                        name = "省份甲",
                     ),
                 ),
             ),
@@ -236,7 +236,7 @@ class MerchantRepositoryTest {
 
         val apiService = mockk<MerchantApiService>()
         coEvery {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         } coAnswers {
             // 让第一个调用保持挂起，确保第二个调用会在缓存写入前尝试进入 Repository
             delay(100)
@@ -246,20 +246,20 @@ class MerchantRepositoryTest {
 
         val expected = ApiResult.Success(
             listOf(
-                MerchantCity(
+                MerchantProvince(
                     code = "code-a",
-                    name = "城市甲",
+                    name = "省份甲",
                 ),
             ),
         )
-        val results: List<ApiResult<List<MerchantCity>>> = listOf(
-            async { repository.getMerchantCities() },
-            async { repository.getMerchantCities() },
+        val results: List<ApiResult<List<MerchantProvince>>> = listOf(
+            async { repository.getMerchantProvinces() },
+            async { repository.getMerchantProvinces() },
         ).awaitAll()
 
         assertEquals(listOf(expected, expected), results)
         coVerify(exactly = 1) {
-            apiService.getMerchantCities()
+            apiService.getMerchantProvinces()
         }
     }
 
