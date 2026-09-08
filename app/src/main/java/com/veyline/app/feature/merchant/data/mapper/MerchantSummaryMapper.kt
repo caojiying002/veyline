@@ -14,6 +14,11 @@ import javax.inject.Inject
  * 服务端返回了非空列表，但其中没有任何有效记录，则抛出 [InvalidApiDataException]，
  * 避免将异常数据误判为正常空列表。
  *
+ * 服务端使用统一的 `cityCode` 字段表示地区筛选代码，但商家列表中该字段
+ * 实际表示省级行政区代码。[MerchantSummaryDto] 保留 `cityCode` 以便直接对照接口协议；转换到
+ * [MerchantSummary] 时使用 `provinceCode`，使领域层及上层代码表达真实的业务含义。
+ * 两层命名不同是有意的协议到业务语义转换。
+ *
  * 有效的封面图片相对路径会通过 [ImageUrlResolver] 转换成完整请求地址，使领域模型和
  * UI 不需要了解图片域名及路径拼接规则。空白图片路径统一转换为 `null`。
  *

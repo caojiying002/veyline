@@ -14,7 +14,7 @@ import com.squareup.moshi.JsonClass
  *
  * @property id 服务端返回的商家唯一标识；列表项去重和后续导航需要该字段。
  * @property name 服务端返回的商家名称。
- * @property cityCode 服务端返回的地区代码，用于转换列表展示的地区名称。
+ * @property cityCode 服务端协议统一使用的地区筛选代码；在商家列表中实际表示省级行政区。
  * @property intro 服务端返回的商家简介；允许缺失或为空。
  * @property coverPicture 服务端返回的封面图片相对路径；允许缺失或为空，不包含图片域名。
  */

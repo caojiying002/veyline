@@ -9,7 +9,7 @@ package com.veyline.app.feature.merchant.domain.model
  *
  * @property id 商家唯一标识，用于列表项去重和后续导航。
  * @property name 经过清理的商家名称。
- * @property provinceCode 经过校验的省份代码，用于转换列表展示的地区名称。
+ * @property provinceCode 由网络模型的 `cityCode` 转换而来的省级行政区代码。
  * @property intro 经过清理的商家简介；服务端未提供有效内容时为空字符串。
  * @property coverImageUrl 可直接请求的封面图片完整地址；没有有效图片路径时为 `null`。
  */
