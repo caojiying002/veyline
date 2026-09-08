@@ -1,5 +1,6 @@
 package com.veyline.app.feature.merchant.presentation.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -163,8 +164,12 @@ private fun MerchantMetadataRow(
         Text(
             text = stringResource(R.string.merchant_label),
             style = VeylineTextStyles.Body,
-            color = VeylineTheme.colors.textLight,
+            color = VeylineTheme.colors.textOnButton,
             maxLines = 1,
+            modifier = Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(VeylineTheme.colors.primary)
+                .padding(horizontal = 6.dp, vertical = 2.dp),
         )
     }
 }
