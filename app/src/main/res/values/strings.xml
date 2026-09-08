@@ -12,6 +12,12 @@
     <string name="error_connection">网络连接失败，请检查网络后重试</string>
     <string name="error_technical">出错了，请稍后重试</string>
 
+    <string name="refresh_pull_down">下拉刷新</string>
+    <string name="refresh_release">松开刷新</string>
+    <string name="refresh_loading">正在刷新</string>
+    <string name="refresh_success">刷新成功</string>
+    <string name="refresh_failed">刷新失败</string>
+
     <string name="paging_retry_hint">点击重试</string>
     <string name="paging_error_with_retry">加载失败，%1$s</string>
 
