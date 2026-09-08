@@ -31,7 +31,7 @@ class MerchantSummaryMapperTest {
             MerchantSummary(
                 id = "merchant-a",
                 name = "商家甲",
-                cityCode = "city-a",
+                provinceCode = "city-a",
                 intro = "商家简介",
                 coverImageUrl = "https://example.test/images/merchant-a.jpg",
             ),

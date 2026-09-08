@@ -43,7 +43,7 @@ class MerchantRepositoryTest {
         val merchantDto = MerchantSummaryDto(
             id = "merchant-a",
             name = "商家甲",
-            cityCode = "city-a",
+            cityCode = "province-a",
             intro = "商家简介",
             coverPicture = null,
         )
@@ -53,7 +53,7 @@ class MerchantRepositoryTest {
             apiService.getMerchants(
                 page = 1,
                 perPage = 12,
-                cityCode = "city-a",
+                cityCode = "province-a",
             )
         } returns Response.success(
             ApiResponseDto(
@@ -71,14 +71,14 @@ class MerchantRepositoryTest {
         val repository = createRepository(apiService)
 
         val merchants = repository
-            .getMerchants(cityCode = "  city-a  ") // 验证 Repository 会清理地区代码两侧的空白
+            .getMerchants(provinceCode = "  province-a  ") // 验证 Repository 会清理地区代码两侧的空白
             .asSnapshot() // 收集 PagingData 当前加载结果，并转换为便于断言的普通 List
 
         val expected = listOf(
             MerchantSummary(
                 id = "merchant-a",
                 name = "商家甲",
-                cityCode = "city-a",
+                provinceCode = "province-a",
                 intro = "商家简介",
                 coverImageUrl = null,
             ),

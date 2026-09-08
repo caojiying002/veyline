@@ -52,13 +52,13 @@ class MerchantRepository @Inject constructor(
      * 数量而产生数据重叠或遗漏。返回的流没有在 Repository 中调用 `cachedIn()`，该操作应
      * 由 ViewModel 结合自身生命周期完成。
      *
-     * @param cityCode 城市筛选代码；`null` 或空白内容表示不限制城市。
+     * @param provinceCode 省份筛选代码；`null` 或空白内容表示不限制地区。
      * @return 按当前城市条件分页加载的商家列表数据流。
      */
     fun getMerchants(
-        cityCode: String?,
+        provinceCode: String?,
     ): Flow<PagingData<MerchantSummary>> {
-        val apiCityCode = cityCode
+        val apiProvinceCode = provinceCode
             ?.trim()
             ?.takeIf { it.isNotEmpty() }
 
@@ -73,7 +73,7 @@ class MerchantRepository @Inject constructor(
                 MerchantPagingSource(
                     apiService = apiService,
                     merchantSummaryMapper = merchantSummaryMapper,
-                    cityCode = apiCityCode,
+                    provinceCode = apiProvinceCode,
                 )
             },
         ).flow

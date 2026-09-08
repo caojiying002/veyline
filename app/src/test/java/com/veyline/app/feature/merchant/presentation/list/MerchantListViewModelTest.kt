@@ -65,7 +65,7 @@ class MerchantListViewModelTest {
     fun initialLoad_beforeCollection_requestsMerchantsForAllCities() = runTest {
         val repository = mockk<MerchantRepository>()
         every {
-            repository.getMerchants(cityCode = null)
+            repository.getMerchants(provinceCode = null)
         } returns flowOf(
             PagingData.empty()
         )
@@ -82,7 +82,7 @@ class MerchantListViewModelTest {
         runCurrent()
 
         verify(exactly = 1) {
-            repository.getMerchants(cityCode = null)
+            repository.getMerchants(provinceCode = null)
         }
     }
 

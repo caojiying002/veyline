@@ -27,12 +27,12 @@ import java.util.logging.Logger
  *
  * @property apiService 商家 API 服务。
  * @property merchantSummaryMapper 商家列表 DTO 到领域模型的转换器。
- * @property cityCode 城市筛选代码；`null` 表示不限制城市。
+ * @property provinceCode 省份筛选代码；`null` 表示不限制地区。
  */
 class MerchantPagingSource(
     private val apiService: MerchantApiService,
     private val merchantSummaryMapper: MerchantSummaryMapper,
-    private val cityCode: String?,
+    private val provinceCode: String?,
 ) : PagingSource<Int, MerchantSummary>() {
 
     /** 当前数据源实例已经输出的商家 ID，用于统一过滤页内和跨页重复数据。 */
@@ -50,7 +50,7 @@ class MerchantPagingSource(
             apiService.getMerchants(
                 page = requestedPage,
                 perPage = params.loadSize,
-                cityCode = cityCode,
+                cityCode = provinceCode,
             )
         }
 

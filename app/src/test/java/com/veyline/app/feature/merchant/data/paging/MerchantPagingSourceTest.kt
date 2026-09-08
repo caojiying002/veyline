@@ -27,11 +27,11 @@ class MerchantPagingSourceTest {
     /** 验证首次加载成功时返回映射后的商家数据和下一页页码。 */
     @Test
     fun load_withFirstPage_returnsMerchantsAndNextPageKey() = runTest {
-        val cityCode = "city-a"
+        val provinceCode = "province-a"
         val merchantDto = MerchantSummaryDto(
             id = "merchant-a",
             name = "商家甲",
-            cityCode = cityCode,
+            cityCode = provinceCode,
             intro = "商家简介",
             coverPicture = "merchant-a.jpg",
         )
@@ -41,7 +41,7 @@ class MerchantPagingSourceTest {
             apiService.getMerchants(
                 page = 1,
                 perPage = 12,
-                cityCode = cityCode,
+                cityCode = provinceCode,
             )
         } returns Response.success(
             ApiResponseDto(
@@ -60,7 +60,7 @@ class MerchantPagingSourceTest {
 
         val pagingSource = createPagingSource(
             apiService = apiService,
-            cityCode = cityCode,
+            provinceCode = provinceCode,
         )
         val loadParams = PagingSource.LoadParams.Refresh<Int>(
             key = null,
@@ -74,7 +74,7 @@ class MerchantPagingSourceTest {
         val expectedMerchantSummary = MerchantSummary(
             id = "merchant-a",
             name = "商家甲",
-            cityCode = cityCode,
+            provinceCode = provinceCode,
             intro = "商家简介",
             coverImageUrl = "https://example.test/images/merchant-a.jpg",
         )
@@ -118,7 +118,7 @@ class MerchantPagingSourceTest {
 
         val pagingSource = createPagingSource(
             apiService = apiService,
-            cityCode = cityCode,
+            provinceCode = cityCode,
         )
         val loadParams = PagingSource.LoadParams.Append(
             key = 2,
@@ -159,7 +159,7 @@ class MerchantPagingSourceTest {
 
         val pagingSource = createPagingSource(
             apiService = apiService,
-            cityCode = null,
+            provinceCode = null,
         )
         val loadParams = PagingSource.LoadParams.Refresh<Int>(
             key = null,
@@ -200,7 +200,7 @@ class MerchantPagingSourceTest {
 
         val pagingSource = createPagingSource(
             apiService = apiService,
-            cityCode = null,
+            provinceCode = null,
         )
         val loadParams = PagingSource.LoadParams.Refresh<Int>(
             key = null,
@@ -239,7 +239,7 @@ class MerchantPagingSourceTest {
 
         val pagingSource = createPagingSource(
             apiService = apiService,
-            cityCode = null,
+            provinceCode = null,
         )
         val loadParams = PagingSource.LoadParams.Append(
             key = 2,
@@ -278,12 +278,12 @@ class MerchantPagingSourceTest {
 
     private fun createPagingSource(
         apiService: MerchantApiService,
-        cityCode: String? = null,
+        provinceCode: String? = null,
     ): MerchantPagingSource =
         MerchantPagingSource(
             apiService = apiService,
             merchantSummaryMapper = merchantSummaryMapper,
-            cityCode = cityCode,
+            provinceCode = provinceCode,
         )
 
     private companion object {

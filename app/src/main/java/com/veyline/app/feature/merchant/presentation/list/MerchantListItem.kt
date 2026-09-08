@@ -1,7 +1,6 @@
 package com.veyline.app.feature.merchant.presentation.list
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -124,14 +123,14 @@ private fun MerchantTextContent(
 
         //
         MerchantMetadataRow(
-            cityCode = merchant.cityCode,
+            provinceCode = merchant.provinceCode,
         )
     }
 }
 
 @Composable
 private fun MerchantMetadataRow(
-    cityCode: String,
+    provinceCode: String,
     modifier: Modifier = Modifier,
 ) {
     // 地区图标跟随系统字体大小缩放，与同一行文字保持相对比例
@@ -150,7 +149,7 @@ private fun MerchantMetadataRow(
         )
         Spacer(modifier = Modifier.width(SpacingSmall))
         Text(
-            text = cityCode,    // TODO 转换为城市/省份名显示
+            text = provinceCode,    // TODO 转换为城市/省份名显示
             style = VeylineTextStyles.Body,
             color = VeylineTheme.colors.primary,
             maxLines = 1,

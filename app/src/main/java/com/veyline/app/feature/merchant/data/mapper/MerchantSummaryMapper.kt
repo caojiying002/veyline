@@ -56,7 +56,7 @@ class MerchantSummaryMapper @Inject constructor(
             merchants += MerchantSummary(
                 id = id,
                 name = name,
-                cityCode = cityCode,
+                provinceCode = cityCode,    // DTO `cityCode` 转成 `provinceCode` 领域层命名
                 intro = merchantDto.intro?.trim().orEmpty(),
                 coverImageUrl = coverImagePath?.let {
                     imageUrlResolver.resolve(it)
