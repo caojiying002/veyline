@@ -56,7 +56,7 @@ fun AppPagingLoadingFooter(
             .padding(SpacingLarge)
             .semantics(mergeDescendants = true) {},
         horizontalArrangement = Arrangement.spacedBy(
-            space = SpacingMedium,
+            space = 12.dp,
             alignment = Alignment.CenterHorizontally,
         ),
         verticalAlignment = Alignment.CenterVertically,
@@ -69,7 +69,7 @@ fun AppPagingLoadingFooter(
 
         Text(
             text = stringResource(R.string.state_loading),
-            style = VeylineTextStyles.Body,
+            style = VeylineTextStyles.ItemTitle,
             color = VeylineTheme.colors.textLight,
         )
     }
@@ -127,7 +127,7 @@ fun AppPagingErrorFooter(
     ) {
         Text(
             text = annotatedText,
-            style = VeylineTextStyles.Body,
+            style = VeylineTextStyles.ItemTitle,
             color = VeylineTheme.colors.textLight,
             textAlign = TextAlign.Center,
         )
