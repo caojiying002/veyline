@@ -150,6 +150,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
 
+    // 本地数据存储
+    implementation(libs.androidx.datastore.preferences)
+
     // View 体系基础组件（用于与 Compose 混合开发）
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.fragment.compose)
