@@ -12,11 +12,11 @@ import com.squareup.moshi.JsonClass
  * Mapper 负责校验必要字段、清理可选内容并转换为具有非空约束的领域模型；DTO 不应直接
  * 进入 ViewModel 或 UI。
  *
- * @property id 服务端返回的商家唯一标识；列表项去重和后续导航需要该字段。
- * @property name 服务端返回的商家名称。
- * @property cityCode 服务端协议统一使用的地区筛选代码；在商家列表中实际表示省级行政区。
- * @property intro 服务端返回的商家简介；允许缺失或为空。
- * @property coverPicture 服务端返回的封面图片相对路径；允许缺失或为空，不包含图片域名。
+ * @property id 服务端返回的商家唯一标识；列表项去重和后续导航需要该字段
+ * @property name 服务端返回的商家名称
+ * @property cityCode 服务端协议统一使用的地区筛选代码；在商家列表中实际表示省级行政区
+ * @property intro 服务端返回的商家简介
+ * @property coverPicture 服务端返回的封面图片相对路径；允许缺失或为空，不包含图片域名
  */
 @JsonClass(generateAdapter = true)
 data class MerchantSummaryDto(
