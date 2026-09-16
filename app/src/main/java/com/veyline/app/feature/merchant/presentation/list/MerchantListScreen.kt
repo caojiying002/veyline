@@ -12,6 +12,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -67,7 +68,6 @@ fun MerchantListRoute(
         .collectAsStateWithLifecycle()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val merchants = viewModel.merchants.collectAsLazyPagingItems()
 
     LaunchedEffect(provinceSelectionResult, viewModel) {
         val result = provinceSelectionResult ?: return@LaunchedEffect
@@ -87,15 +87,24 @@ fun MerchantListRoute(
         viewModel.onAction(MerchantListAction.InitialLoad)
     }*/
 
-    MerchantListScreen(
-        uiState = uiState,
-        merchants = merchants,
-        onProvinceSelectionClick = onNavigateToProvinceSelection,
-        onMerchantClick = { merchant ->
-            onNavigateToMerchantDetail(merchant.id)
-        },
-        modifier = modifier,
-    )
+    // 按 selectedProvince 重建这个子树：不这样做的话，切换地区后 Paging 只是在旧的
+    // LazyPagingItems 内部悄悄换源，标题栏会立刻显示新地区，但列表在加载/报错期间
+    // 仍展示旧地区已缓存的商家数据，出现"标题与内容不一致"的中间态。用 key() 强制
+    // 连同 collectAsLazyPagingItems() 一起丢弃重建，让标题栏和列表内容随同一次地区
+    // 切换一起更新
+    key(uiState.selectedProvince, viewModel) {
+        val merchants = viewModel.merchants.collectAsLazyPagingItems()
+
+        MerchantListScreen(
+            uiState = uiState,
+            merchants = merchants,
+            onProvinceSelectionClick = onNavigateToProvinceSelection,
+            onMerchantClick = { merchant ->
+                onNavigateToMerchantDetail(merchant.id)
+            },
+            modifier = modifier,
+        )
+    }
 }
 
 /**
