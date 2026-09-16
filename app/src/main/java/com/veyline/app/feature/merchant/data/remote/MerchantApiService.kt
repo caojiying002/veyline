@@ -2,6 +2,7 @@ package com.veyline.app.feature.merchant.data.remote
 
 import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
+import com.veyline.app.feature.merchant.data.remote.model.MerchantDetailDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
 import retrofit2.Response
@@ -19,21 +20,21 @@ interface MerchantApiService {
     /**
      * 获取可用于筛选商家列表的地区。
      *
-     * @return 包含商家城市网络模型列表的通用 API 响应。
+     * @return 包含商家城市网络模型列表的通用 API 响应
      */
     @GET("config/merchantCity.json")
     suspend fun getMerchantProvinces(): Response<ApiResponseDto<List<MerchantProvinceDto>>>
 
     /**
-     * 按城市获取商家摘要分页数据。
+     * 按城市获取商家列表分页数据。
      *
      * [perPage] 不提供客户端默认值，调用方必须明确传入与 Paging 配置一致的每页数量，
      * 避免 Retrofit 默认值、Paging 配置和服务端默认值不一致。
      *
-     * @param page 请求页码；接口约定从 `1` 开始。
-     * @param perPage 本次请求的每页数量。
-     * @param cityCode 城市代码；传入 `null` 时 Retrofit 省略该查询参数，表示查询全部城市。
-     * @return 包含商家摘要分页数据的通用 API 响应。
+     * @param page 请求页码；接口约定从 `1` 开始
+     * @param perPage 本次请求的每页数量
+     * @param cityCode 城市代码；传入 `null` 时 Retrofit 省略该查询参数，表示查询全部城市
+     * @return 包含商家列表分页数据的通用 API 响应
      */
     @GET("merchant/page.json")
     suspend fun getMerchants(
@@ -41,4 +42,15 @@ interface MerchantApiService {
         @Query("perPage") perPage: Int,
         @Query("cityCode") cityCode: String?,
     ): Response<ApiResponseDto<PagedDataDto<MerchantSummaryDto>>>
+
+    /**
+     * 获取商家详情。
+     *
+     * @param merchantId 商家 ID
+     * @return 包含商家详情网络模型的通用 API 响应
+     */
+    @GET("merchant/detail.json")
+    suspend fun getMerchantDetail(
+        @Query("merchantId") merchantId: String
+    ): Response<ApiResponseDto<MerchantDetailDto>>
 }

@@ -6,10 +6,13 @@ import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
 import com.veyline.app.data.network.result.ApiResult
+import com.veyline.app.feature.merchant.data.mapper.MerchantDetailMapper
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
+import com.veyline.app.feature.merchant.data.remote.model.MerchantDetailDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
+import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
 import io.mockk.coEvery
@@ -23,18 +26,21 @@ import org.junit.Test
 import retrofit2.Response
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * 验证 [MerchantRepository] 对商家分页数据和地区筛选数据的组织边界。
- *
- * 商家分页测试关注 Pager 的首次加载配置、筛选参数规范化以及向上层暴露的领域模型；地区
- * 列表测试关注网络结果转换，以及成功、空数据和失败结果对应的进程内缓存行为。Mapper 和
- * PagingSource 内部的具体字段校验、分页键计算与去重规则由各自的独立测试覆盖。
- */
+/** 验证 [MerchantRepository] 在商家分页、省份列表与商家详情三类数据上的行为。 */
 class MerchantRepositoryTest {
 
+    private val imageUrlResolver = ImageUrlResolver(
+        baseUrl = "https://example.test/images/",
+    )
+
     private val merchantSummaryMapper = MerchantSummaryMapper(
-        imageUrlResolver = ImageUrlResolver(TEST_IMAGE_BASE_URL),
+        imageUrlResolver = imageUrlResolver,
+    )
+
+    private val merchantDetailMapper = MerchantDetailMapper(
+        imageUrlResolver = imageUrlResolver,
     )
 
     /** 验证商家分页首次加载使用固定页大小，并规范化地区筛选代码。 */
@@ -239,7 +245,7 @@ class MerchantRepositoryTest {
             apiService.getMerchantProvinces()
         } coAnswers {
             // 让第一个调用保持挂起，确保第二个调用会在缓存写入前尝试进入 Repository
-            delay(100)
+            delay(100.milliseconds)
             response
         }
         val repository = createRepository(apiService)
@@ -263,15 +269,117 @@ class MerchantRepositoryTest {
         }
     }
 
+    /** 验证详情接口成功时返回经过清洗和图片地址解析的领域模型。 */
+    @Test
+    fun getMerchantDetail_withSuccessfulResponse_returnsMappedDetail() = runTest {
+        val detailDto = MerchantDetailDto(
+            id = " merchant-a ",
+            name = " 商家甲 ",
+            cityCode = " province-a ",
+            picture = "first.jpg, second.jpg",
+            desc = " 商家详情 ",
+            contact = " 联系方式 ",
+        )
+        val apiService = mockk<MerchantApiService>()
+        coEvery {
+            apiService.getMerchantDetail(
+                merchantId = "merchant-a",
+            )
+        } returns Response.success(
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
+                msg = "success",
+                data = detailDto,
+            ),
+        )
+
+        val expected = ApiResult.Success(
+            MerchantDetail(
+                id = "merchant-a",
+                name = "商家甲",
+                provinceCode = "province-a",
+                imageUrls = listOf(
+                    "https://example.test/images/first.jpg",
+                    "https://example.test/images/second.jpg",
+                ),
+                description = "商家详情",
+                contact = "联系方式",
+            ),
+        )
+
+        val repository = createRepository(apiService)
+        val result = repository.getMerchantDetail(
+            merchantId = "merchant-a",
+        )
+        assertEquals(expected, result)
+    }
+
+    /** 验证详情响应缺少必要字段时返回序列化失败。 */
+    @Test
+    fun getMerchantDetail_withInvalidData_returnsSerializationFailure() = runTest {
+        val invalidDetailDto = MerchantDetailDto(
+            id = null,
+            name = "商家甲",
+            cityCode = "province-a",
+            picture = null,
+            desc = null,
+            contact = null,
+        )
+        val apiService = mockk<MerchantApiService>()
+        coEvery {
+            apiService.getMerchantDetail(
+                merchantId = "merchant-a",
+            )
+        } returns Response.success(
+            ApiResponseDto(
+                code = ApiResponseDto.CODE_SUCCESS,
+                msg = "success",
+                data = invalidDetailDto,
+            ),
+        )
+
+        val repository = createRepository(apiService)
+        // ID为 `null`，预期返回序列化失败
+        val result = repository.getMerchantDetail(
+            merchantId = "merchant-a",
+        )
+        assertIs<ApiResult.Failure.Serialization>(result)
+        assertIs<InvalidApiDataException>(result.exception)
+    }
+
+    /** 验证详情接口返回业务失败时保留原始失败信息。 */
+    @Test
+    fun getMerchantDetail_withBusinessFailure_returnsBusinessFailure() = runTest {
+        val apiService = mockk<MerchantApiService>()
+        coEvery {
+            apiService.getMerchantDetail(
+                merchantId = "merchant-a",
+            )
+        } returns Response.success(
+            ApiResponseDto(
+                code = 1000,
+                msg = "business failed",
+                data = null,
+            ),
+        )
+
+        val expected = ApiResult.Failure.Business(
+            code = 1000,
+            message = "business failed",
+        )
+        val repository = createRepository(apiService)
+        val result = repository.getMerchantDetail(
+            merchantId = "merchant-a",
+        )
+        assertEquals(expected, result)
+    }
+
     private fun createRepository(
         apiService: MerchantApiService,
     ): MerchantRepository =
         MerchantRepository(
             apiService = apiService,
             merchantSummaryMapper = merchantSummaryMapper,
+            merchantDetailMapper = merchantDetailMapper,
         )
-
-    private companion object {
-        const val TEST_IMAGE_BASE_URL = "https://example.test/images/"
-    }
 }

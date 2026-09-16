@@ -6,11 +6,14 @@ import androidx.paging.PagingData
 import com.veyline.app.data.network.apiCall
 import com.veyline.app.data.network.exception.InvalidApiDataException
 import com.veyline.app.data.network.result.ApiResult
+import com.veyline.app.feature.merchant.data.mapper.MerchantDetailMapper
 import com.veyline.app.feature.merchant.data.mapper.MerchantProvinceMapper
 import com.veyline.app.feature.merchant.data.mapper.MerchantSummaryMapper
 import com.veyline.app.feature.merchant.data.paging.MerchantPagingSource
 import com.veyline.app.feature.merchant.data.remote.MerchantApiService
+import com.veyline.app.feature.merchant.data.remote.model.MerchantDetailDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
+import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +36,7 @@ import javax.inject.Singleton
 class MerchantRepository @Inject constructor(
     private val apiService: MerchantApiService,
     private val merchantSummaryMapper: MerchantSummaryMapper,
+    private val merchantDetailMapper: MerchantDetailMapper,
 ) {
 
     /** 同步缓存访问，并避免多个首次调用同时发起相同的城市列表请求。 */
@@ -80,6 +84,28 @@ class MerchantRepository @Inject constructor(
     }
 
     /**
+     * 获取指定商家的详情。
+     *
+     * [merchantId] 预期来自已校验过的领域模型（如 [MerchantSummary.id]），本方法不再
+     * 重复校验其格式。
+     *
+     * @param merchantId 商家 ID
+     * @return 转换后的商家详情；网络、业务或数据校验失败时返回对应的失败结果
+     */
+    suspend fun getMerchantDetail(
+        merchantId: String
+    ): ApiResult<MerchantDetail> {
+        val result = apiCall {
+            apiService.getMerchantDetail(merchantId)
+        }
+
+        return when (result) {
+            is ApiResult.Success -> mapDetail(result.data)
+            is ApiResult.Failure -> result
+        }
+    }
+
+    /**
      * 获取可用于商家筛选的地区列表。
      *
      * 缓存命中时直接返回；缓存未命中时，在互斥区内完成网络请求、数据校验与缓存写入，
@@ -112,7 +138,20 @@ class MerchantRepository @Inject constructor(
         provinceDtos: List<MerchantProvinceDto>,
     ): ApiResult<List<MerchantProvince>> =
         try {
-            ApiResult.Success(MerchantProvinceMapper.map(provinceDtos))
+            ApiResult.Success(
+                data = MerchantProvinceMapper.map(provinceDtos),
+            )
+        } catch (exception: InvalidApiDataException) {
+            ApiResult.Failure.Serialization(exception)
+        }
+
+    private fun mapDetail(
+        detailDto: MerchantDetailDto,
+    ): ApiResult<MerchantDetail> =
+        try {
+            ApiResult.Success(
+                data = merchantDetailMapper.map(detailDto),
+            )
         } catch (exception: InvalidApiDataException) {
             ApiResult.Failure.Serialization(exception)
         }

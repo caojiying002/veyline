@@ -46,9 +46,10 @@ class MerchantSummaryMapper @Inject constructor(
         for (merchantDto in merchantSummaryDtos) {
             val id = merchantDto.id?.trim()
             val name = merchantDto.name?.trim()
-            val cityCode = merchantDto.cityCode?.trim()
+            // 这里把 `cityCode` 转换为 `provinceCode` 领域层命名
+            val provinceCode = merchantDto.cityCode?.trim()
 
-            if (id.isNullOrEmpty() || name.isNullOrEmpty() || cityCode.isNullOrEmpty()) {
+            if (id.isNullOrEmpty() || name.isNullOrEmpty() || provinceCode.isNullOrEmpty()) {
                 invalidCount++
                 continue
             }
@@ -61,7 +62,7 @@ class MerchantSummaryMapper @Inject constructor(
             merchants += MerchantSummary(
                 id = id,
                 name = name,
-                provinceCode = cityCode,    // DTO `cityCode` 转成 `provinceCode` 领域层命名
+                provinceCode = provinceCode,
                 intro = merchantDto.intro?.trim().orEmpty(),
                 coverImageUrl = coverImagePath?.let {
                     imageUrlResolver.resolve(it)
