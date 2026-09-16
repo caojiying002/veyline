@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -22,7 +23,10 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.veyline.app.R
 import com.veyline.app.data.paging.PagingFailureException
+import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
+import com.veyline.app.navigation.MERCHANT_PROVINCE_SELECTION_RESULT_KEY
+import com.veyline.app.navigation.MerchantProvinceSelectionResult
 import com.veyline.app.ui.components.AppEmptyContent
 import com.veyline.app.ui.components.AppErrorContent
 import com.veyline.app.ui.components.AppLoadingContent
@@ -41,7 +45,7 @@ private const val VIEW_MODEL_KEY = "merchant:list"
  * 商家列表的有状态入口。
  *
  * 负责获取 ViewModel、收集页面状态和分页数据，并连接外部导航回调。
- * 当前进入组合时即视为页面可见，首次加载由 ViewModel 保证幂等。
+ * [MerchantListViewModel.merchants] 一旦在这里被订阅就会立即按当前筛选条件发起请求。
  *
  * @param onNavigateToProvinceSelection 打开地区选择页面
  * @param onNavigateToMerchantDetail 根据商家 ID 打开详情页面
@@ -50,6 +54,7 @@ private const val VIEW_MODEL_KEY = "merchant:list"
  */
 @Composable
 fun MerchantListRoute(
+    savedStateHandle: SavedStateHandle,
     onNavigateToProvinceSelection: () -> Unit,
     onNavigateToMerchantDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -57,12 +62,30 @@ fun MerchantListRoute(
         key = VIEW_MODEL_KEY,
     ),
 ) {
+    val provinceSelectionResult by savedStateHandle
+        .getStateFlow<MerchantProvinceSelectionResult?>(MERCHANT_PROVINCE_SELECTION_RESULT_KEY, null)
+        .collectAsStateWithLifecycle()
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val merchants = viewModel.merchants.collectAsLazyPagingItems()
 
-    LaunchedEffect(viewModel) {
-        viewModel.onAction(MerchantListAction.InitialLoad)
+    LaunchedEffect(provinceSelectionResult, viewModel) {
+        val result = provinceSelectionResult ?: return@LaunchedEffect
+
+        viewModel.onAction(
+            if (result.code != null && result.name != null)
+                MerchantListAction.SelectProvince(MerchantProvince(result.code, result.name))
+            else
+                MerchantListAction.SelectAllProvinces
+        )
+
+        // 【重要】消费后把值置空
+        savedStateHandle[MERCHANT_PROVINCE_SELECTION_RESULT_KEY] = null
     }
+
+    /*LaunchedEffect(viewModel) {
+        viewModel.onAction(MerchantListAction.InitialLoad)
+    }*/
 
     MerchantListScreen(
         uiState = uiState,
@@ -124,6 +147,9 @@ fun MerchantListScreen(
             val appendState = merchants.loadState.append
 
             when {
+                // 尚未触发首次加载，保持内容区域空白
+                !uiState.hasTriggeredInitialLoad -> Unit
+
                 // 已有内容时保留列表，刷新或分页失败不替换整页
                 merchants.itemCount > 0 -> {
                     PullToRefreshBox(
@@ -189,9 +215,6 @@ fun MerchantListScreen(
                         message = stringResource(R.string.merchant_list_empty),
                     )
                 }
-
-                // 尚未触发首次加载，保持内容区域空白
-                else -> Unit
             }
         }
     }
