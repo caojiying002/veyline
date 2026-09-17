@@ -63,7 +63,7 @@ class MerchantProvinceSelectionViewModel @Inject constructor(
     val uiState: StateFlow<MerchantProvinceSelectionUiState> = _uiState.asStateFlow()
 
     /** 防止页面重组等原因重复触发首次加载；加载失败后也不会自动重置。 */
-    private var hasRequestedInitialLoad = false
+    private var hasTriggeredInitialLoad = false
 
     /** 防止城市加载尚未完成时再次发起相同请求。 */
     private var loadProvincesJob: Job? = null
@@ -71,17 +71,17 @@ class MerchantProvinceSelectionViewModel @Inject constructor(
     @MainThread
     fun onAction(action: MerchantProvinceSelectionAction) {
         when (action) {
-            MerchantProvinceSelectionAction.InitialLoad -> requestInitialLoad()
+            MerchantProvinceSelectionAction.InitialLoad -> triggerInitialLoad()
             MerchantProvinceSelectionAction.Retry -> loadProvinces()
         }
     }
 
-    private fun requestInitialLoad() {
-        if (hasRequestedInitialLoad) {
+    private fun triggerInitialLoad() {
+        if (hasTriggeredInitialLoad) {
             return
         }
 
-        hasRequestedInitialLoad = true
+        hasTriggeredInitialLoad = true
         loadProvinces()
     }
 
