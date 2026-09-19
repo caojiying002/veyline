@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -13,26 +15,40 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.veyline.app.R
 import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.ui.components.AppBackTopBar
+import com.veyline.app.ui.components.AppCard
 import com.veyline.app.ui.components.AppErrorContent
 import com.veyline.app.ui.components.AppLoadingContent
 import com.veyline.app.ui.components.DetailImageGrid
 import com.veyline.app.ui.error.UiError
+import com.veyline.app.ui.theme.CardContentPadding
 import com.veyline.app.ui.theme.DefaultHorizontalSpace
+import com.veyline.app.ui.theme.DefaultVerticalSpace
 import com.veyline.app.ui.theme.DividerHeight
+import com.veyline.app.ui.theme.SpacingLarge
+import com.veyline.app.ui.theme.SpacingSmall
+import com.veyline.app.ui.theme.VeylineTextStyles
 import com.veyline.app.ui.theme.VeylineTheme
 
 private const val VIEW_MODEL_KEY_PREFIX = "merchant:detail:"
@@ -159,6 +175,60 @@ private fun MerchantDetailContent(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // 后续接入商家基本信息和联系方式
+        MerchantBasicInfoCard(
+            merchant = merchant,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // 后续接入登录状态和联系方式
+    }
+}
+
+@Composable
+private fun MerchantBasicInfoCard(
+    merchant: MerchantDetail,
+    modifier: Modifier = Modifier,
+) {
+    // 地区图标跟随字体缩放
+    val iconSize = with(LocalDensity.current) { 16.sp.toDp() }
+
+    AppCard(
+        modifier = modifier,
+        contentPadding = PaddingValues(
+            horizontal = CardContentPadding,
+            vertical = DefaultVerticalSpace
+        ),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(SpacingLarge),
+        ) {
+            Text(
+                text = merchant.name,
+                style = VeylineTextStyles.Title,
+                color = VeylineTheme.colors.textTitle,
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_location),
+                    contentDescription = null,
+                    tint = VeylineTheme.colors.primary,
+                    modifier = Modifier.size(iconSize),
+                )
+                Spacer(modifier = Modifier.width(SpacingSmall))
+                Text(
+                    text = merchant.provinceCode, // TODO 转换为省份名显示，同 MerchantListItem
+                    style = VeylineTextStyles.Body,
+                    color = VeylineTheme.colors.primary,
+                )
+            }
+
+            Text(
+                text = merchant.description,
+                style = VeylineTextStyles.Body,
+                color = VeylineTheme.colors.textContent,
+            )
+        }
     }
 }

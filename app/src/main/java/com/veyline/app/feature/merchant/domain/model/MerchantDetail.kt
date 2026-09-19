@@ -11,7 +11,7 @@ package com.veyline.app.feature.merchant.domain.model
  * @property name 经过清理的商家名称
  * @property provinceCode 由网络模型的 `cityCode` 转换而来的省级行政区代码
  * @property imageUrls 可直接请求的图片完整地址列表；没有有效图片时为空列表
- * @property description 经过清理的商家详情正文；服务端未提供有效内容时为 `null`
+ * @property description 经过清理的商家详情正文
  * @property contact 经过清理的联系方式；仅 VIP 或已用积分购买的用户可见，其他情况下为 `null`
  */
 data class MerchantDetail(
@@ -19,6 +19,6 @@ data class MerchantDetail(
     val name: String,
     val provinceCode: String,
     val imageUrls: List<String>,
-    val description: String?,
+    val description: String,
     val contact: String?,
 )

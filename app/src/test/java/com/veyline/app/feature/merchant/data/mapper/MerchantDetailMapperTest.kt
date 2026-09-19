@@ -61,7 +61,7 @@ class MerchantDetailMapperTest {
             name = "商家甲",
             provinceCode = "province-a",
             imageUrls = emptyList(),
-            description = null,
+            description = "",
             contact = null,
         )
 
@@ -77,7 +77,7 @@ class MerchantDetailMapperTest {
             name = "商家甲",
             cityCode = "province-a",
             picture = null,
-            desc = null,
+            desc = "商家详情",
             contact = null,
         )
         val invalidDtos = listOf(

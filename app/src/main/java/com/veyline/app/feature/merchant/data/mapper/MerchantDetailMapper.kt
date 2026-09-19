@@ -18,7 +18,9 @@ import javax.inject.Inject
  *
  * `picture` 以英文逗号分隔多张图片的相对路径，逐个清理后通过 [ImageUrlResolver] 转换成
  * 完整请求地址；不同的原始路径解析后可能指向同一张图片（例如是否带开头斜杠），因此
- * 最终会对完整地址去重。`desc`、`contact` 等可选字段的空白内容统一转换为 `null`。
+ * 最终会对完整地址去重。
+ *
+ * 其余可选字段中，`desc` 缺失或空白时转换为空字符串，`contact` 缺失或空白时转换为 `null`。
  *
  * @property imageUrlResolver 图片相对路径到完整请求地址的解析器
  */
@@ -53,7 +55,7 @@ class MerchantDetailMapper @Inject constructor(
             }
             .distinct()
 
-        val description = detailDto.desc?.trim()?.takeIf { it.isNotEmpty() }
+        val description = detailDto.desc?.trim().orEmpty()
         val contact = detailDto.contact?.trim()?.takeIf { it.isNotEmpty() }
 
         return MerchantDetail(
