@@ -1,15 +1,21 @@
 package com.veyline.app.feature.merchant.presentation.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,10 +25,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.veyline.app.R
+import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.ui.components.AppBackTopBar
 import com.veyline.app.ui.components.AppErrorContent
 import com.veyline.app.ui.components.AppLoadingContent
+import com.veyline.app.ui.components.DetailImageGrid
 import com.veyline.app.ui.error.UiError
+import com.veyline.app.ui.theme.DefaultHorizontalSpace
+import com.veyline.app.ui.theme.DividerHeight
 import com.veyline.app.ui.theme.VeylineTheme
 
 private const val VIEW_MODEL_KEY_PREFIX = "merchant:detail:"
@@ -88,7 +98,13 @@ fun MerchantDetailScreen(
                         onRefresh = onRefresh,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        // 下一步在这里实现商家详情内容
+                        val merchant = checkNotNull(uiState.merchant)
+                        MerchantDetailContent(
+                            merchant = merchant,
+                            onImageClick = {},
+                            contentPadding = bottomInsets.asPaddingValues(),
+                            modifier = Modifier.fillMaxSize(),
+                        )
                     }
                 }
 
@@ -115,5 +131,34 @@ fun MerchantDetailScreen(
                 else -> Unit
             }
         }
+    }
+}
+
+@Composable
+private fun MerchantDetailContent(
+    merchant: MerchantDetail,
+    onImageClick: (Int) -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            // 两个 padding 都必须放在 verticalScroll 后面，成为可滚动内容的一部分，
+            // 而不是缩小滚动视口
+            .padding(contentPadding)
+            .padding(
+                horizontal = DefaultHorizontalSpace,
+                vertical = DividerHeight,
+            ),
+        verticalArrangement = Arrangement.spacedBy(DividerHeight)
+    ) {
+        DetailImageGrid(
+            imageUrls = merchant.imageUrls,
+            onImageClick = onImageClick,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // 后续接入商家基本信息和联系方式
     }
 }

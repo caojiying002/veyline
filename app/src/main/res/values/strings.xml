@@ -24,6 +24,8 @@
     <string name="city_selection_title">请选择地区</string>
     <string name="city_selection_hint">选择地区</string>
 
+    <string name="detail_image_content_description">第 %1$d/%2$d 张图片</string>
+
     <string name="merchant_province_all">全国</string>
     <string name="merchant_province_empty">暂无地区数据</string>
     <string name="merchant_label">商家</string>
