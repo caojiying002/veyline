@@ -17,7 +17,8 @@ import com.squareup.moshi.JsonClass
  * @property cityCode 服务端协议统一使用的地区筛选代码；商家详情中实际表示省级行政区
  * @property picture 服务端返回的图片相对路径，多张图片以英文逗号分隔；允许缺失或为空
  * @property desc 服务端返回的商家详情正文；允许缺失或为空
- * @property contact 服务端返回的联系方式；仅 VIP 或已用积分购买的用户可见，其他情况下缺失或为空
+ * @property vipProfileStatus 服务端返回的当前用户会员状态：1 为 VIP，2 为未登录，3 为已登录的非 VIP；取值含义与信息接口的同名字段不同
+ * @property contact 服务端返回的联系方式；仅 VIP 用户可见，其他情况下缺失或为空
  */
 @JsonClass(generateAdapter = true)
 data class MerchantDetailDto(
@@ -26,5 +27,6 @@ data class MerchantDetailDto(
     val cityCode: String?,
     val picture: String?,
     val desc: String?,
+    val vipProfileStatus: Int?,
     val contact: String?,
 )

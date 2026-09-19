@@ -2,6 +2,7 @@ package com.veyline.app.feature.merchant.presentation.detail
 
 import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.merchant.data.MerchantRepository
+import com.veyline.app.feature.merchant.domain.model.MerchantContactAccess
 import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.test.MainDispatcherRule
 import com.veyline.app.ui.error.UiError
@@ -39,7 +40,7 @@ class MerchantDetailViewModelTest {
             provinceCode = "province-a",
             imageUrls = emptyList(),
             description = "商家详情",
-            contact = null,
+            contactAccess = MerchantContactAccess.Unavailable,
         )
 
         val repository = mockk<MerchantRepository>()
@@ -112,7 +113,7 @@ class MerchantDetailViewModelTest {
             provinceCode = "province-a",
             imageUrls = emptyList(),
             description = "原商家详情",
-            contact = null,
+            contactAccess = MerchantContactAccess.Unavailable,
         )
         val refreshedMerchant = initialMerchant.copy(
             description = "更新后的商家详情",
@@ -180,7 +181,7 @@ class MerchantDetailViewModelTest {
             provinceCode = "province-a",
             imageUrls = emptyList(),
             description = "商家详情",
-            contact = null,
+            contactAccess = MerchantContactAccess.Unavailable,
         )
         val repository = mockk<MerchantRepository>()
         coEvery {

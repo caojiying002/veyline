@@ -12,6 +12,7 @@ import com.veyline.app.feature.merchant.data.remote.MerchantApiService
 import com.veyline.app.feature.merchant.data.remote.model.MerchantDetailDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantProvinceDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantSummaryDto
+import com.veyline.app.feature.merchant.domain.model.MerchantContactAccess
 import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.feature.merchant.domain.model.MerchantProvince
 import com.veyline.app.feature.merchant.domain.model.MerchantSummary
@@ -278,6 +279,7 @@ class MerchantRepositoryTest {
             cityCode = " province-a ",
             picture = "first.jpg, second.jpg",
             desc = " 商家详情 ",
+            vipProfileStatus = 1,
             contact = " 联系方式 ",
         )
         val apiService = mockk<MerchantApiService>()
@@ -303,7 +305,7 @@ class MerchantRepositoryTest {
                     "https://example.test/images/second.jpg",
                 ),
                 description = "商家详情",
-                contact = "联系方式",
+                contactAccess = MerchantContactAccess.Available("联系方式"),
             ),
         )
 
@@ -323,6 +325,7 @@ class MerchantRepositoryTest {
             cityCode = "province-a",
             picture = null,
             desc = null,
+            vipProfileStatus = 1,
             contact = null,
         )
         val apiService = mockk<MerchantApiService>()
