@@ -22,7 +22,11 @@ import com.veyline.app.ui.theme.*
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(CardContentPadding),
+    contentPadding: PaddingValues =
+        PaddingValues(
+            horizontal = CardContentPaddingHorizontal,
+            vertical = CardContentPaddingVertical,
+        ),
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(

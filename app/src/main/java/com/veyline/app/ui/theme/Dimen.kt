@@ -21,8 +21,8 @@ val ButtonCornerRadius = 4.dp
 
 // Card
 val CardCornerRadius = 6.dp
-val CardContentPadding = SpacingMedium  // 卡片内部内容的默认边距
-val CardContentPaddingLarge = SpacingLarge
+val CardContentPaddingHorizontal = SpacingMedium
+val CardContentPaddingVertical = 10.dp
 
 // Image
 val ThumbnailCornerRadius = 4.dp

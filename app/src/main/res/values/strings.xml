@@ -6,6 +6,8 @@
     <string name="action_quit">退出</string>
     <string name="action_exit">@string/action_quit</string>
     <string name="action_retry">重试</string>
+    <string name="action_login">登录</string>
+    <string name="action_register">注册</string>
 
     <string name="state_loading">加载中</string>
 
@@ -25,11 +27,15 @@
     <string name="city_selection_hint">选择地区</string>
 
     <string name="detail_image_content_description">第 %1$d/%2$d 张图片</string>
+    <string name="detail_action_login_now">立即登录</string>
+    <string name="detail_action_upgrade_vip_now">立即升级VIP</string>
 
     <string name="merchant_province_all">全国</string>
     <string name="merchant_province_empty">暂无地区数据</string>
     <string name="merchant_label">商家</string>
     <string name="merchant_cover_content_description">%1$s的封面图片</string>
     <string name="merchant_list_empty">暂无商家</string>
+    <string name="merchant_contact_login_required">登录后才能查看联系方式</string>
+    <string name="merchant_contact_vip_required">升级VIP后才能查看联系方式</string>
 
 </resources>

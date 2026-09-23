@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,20 +32,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.veyline.app.R
+import com.veyline.app.feature.merchant.domain.model.MerchantContactAccess
 import com.veyline.app.feature.merchant.domain.model.MerchantDetail
 import com.veyline.app.ui.components.AppBackTopBar
+import com.veyline.app.ui.components.AppButton
 import com.veyline.app.ui.components.AppCard
 import com.veyline.app.ui.components.AppErrorContent
 import com.veyline.app.ui.components.AppLoadingContent
 import com.veyline.app.ui.components.DetailImageGrid
 import com.veyline.app.ui.error.UiError
-import com.veyline.app.ui.theme.CardContentPadding
 import com.veyline.app.ui.theme.DefaultHorizontalSpace
-import com.veyline.app.ui.theme.DefaultVerticalSpace
 import com.veyline.app.ui.theme.DividerHeight
 import com.veyline.app.ui.theme.SpacingLarge
 import com.veyline.app.ui.theme.SpacingSmall
@@ -118,6 +122,8 @@ fun MerchantDetailScreen(
                         MerchantDetailContent(
                             merchant = merchant,
                             onImageClick = {},
+                            onLoginClick = {},
+                            onUpgradeVipClick = {},
                             contentPadding = bottomInsets.asPaddingValues(),
                             modifier = Modifier.fillMaxSize(),
                         )
@@ -154,6 +160,8 @@ fun MerchantDetailScreen(
 private fun MerchantDetailContent(
     merchant: MerchantDetail,
     onImageClick: (Int) -> Unit,
+    onLoginClick: () -> Unit,
+    onUpgradeVipClick: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -177,10 +185,15 @@ private fun MerchantDetailContent(
 
         MerchantBasicInfoCard(
             merchant = merchant,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
-        // 后续接入登录状态和联系方式
+        MerchantContactCard(
+            contactAccess = merchant.contactAccess,
+            onLoginClick = onLoginClick,
+            onUpgradeVipClick = onUpgradeVipClick,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -192,13 +205,7 @@ private fun MerchantBasicInfoCard(
     // 地区图标跟随字体缩放
     val iconSize = with(LocalDensity.current) { 16.sp.toDp() }
 
-    AppCard(
-        modifier = modifier,
-        contentPadding = PaddingValues(
-            horizontal = CardContentPadding,
-            vertical = DefaultVerticalSpace
-        ),
-    ) {
+    AppCard(modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(SpacingLarge),
@@ -228,6 +235,100 @@ private fun MerchantBasicInfoCard(
                 text = merchant.description,
                 style = VeylineTextStyles.Body,
                 color = VeylineTheme.colors.textContent,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MerchantContactCard(
+    contactAccess: MerchantContactAccess,
+    onLoginClick: () -> Unit,
+    onUpgradeVipClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (contactAccess) {
+        is MerchantContactAccess.Available ->
+            AppCard(modifier = modifier) {
+                Text(
+                    text = contactAccess.contact,
+                    style = VeylineTextStyles.Body,
+                    color = VeylineTheme.colors.textContent,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+        MerchantContactAccess.LoginRequired ->
+            ContactLoginRequiredCard(
+                onLoginClick = onLoginClick,
+                modifier = modifier,
+            )
+
+        MerchantContactAccess.VipRequired ->
+            ContactVipRequiredCard(
+                onUpgradeVipClick = onUpgradeVipClick,
+                modifier = modifier,
+            )
+
+        MerchantContactAccess.Unavailable -> Unit
+    }
+}
+
+@Composable
+private fun ContactLoginRequiredCard(
+    onLoginClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AppCard(modifier = modifier) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(SpacingLarge),
+        ) {
+            Text(
+                text = stringResource(R.string.merchant_contact_login_required),
+                fontWeight = FontWeight.Bold,
+                style = VeylineTextStyles.Body,
+                color = VeylineTheme.colors.textContent,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            AppButton(
+                text = stringResource(R.string.detail_action_login_now),
+                onClick = onLoginClick,
+                modifier = Modifier
+                    .widthIn(min = 140.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ContactVipRequiredCard(
+    onUpgradeVipClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AppCard(modifier = modifier) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(SpacingLarge),
+        ) {
+            Text(
+                text = stringResource(R.string.merchant_contact_vip_required),
+                fontWeight = FontWeight.Bold,
+                style = VeylineTextStyles.Body,
+                color = VeylineTheme.colors.textContent,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            AppButton(
+                text = stringResource(R.string.detail_action_upgrade_vip_now),
+                onClick = onUpgradeVipClick,
+                modifier = Modifier
+                    .widthIn(min = 140.dp),
             )
         }
     }

@@ -3,6 +3,8 @@ package com.veyline.app.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,14 +12,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.veyline.app.ui.theme.DefaultHorizontalSpace
-import com.veyline.app.ui.theme.DefaultVerticalSpace
 import com.veyline.app.ui.theme.VeylineTheme
 import com.veyline.app.ui.theme.withLineHeightFix
 
@@ -29,6 +32,8 @@ private val itemTextStyle = TextStyle(
 ).withLineHeightFix()
 
 private val dividerThickness = 0.75.dp
+private val itemPaddingHorizontal = 8.dp
+private val itemPaddingVertical = 10.dp
 
 @Composable
 fun CitySelectionListItem(
@@ -36,14 +41,25 @@ fun CitySelectionListItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .background(VeylineTheme.colors.surface)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .background(
+                if (isPressed) VeylineTheme.colors.simpleListItemPressed
+                else VeylineTheme.colors.surface
+            )
             .padding(
-                horizontal = DefaultHorizontalSpace,
-                vertical = DefaultVerticalSpace,
+                horizontal = itemPaddingHorizontal,
+                vertical = itemPaddingVertical,
             ),
     ) {
         Text(
@@ -69,7 +85,7 @@ fun CitySelectionListDivider(
     HorizontalDivider(
         modifier = modifier,
         thickness = dividerThickness,
-        color = VeylineTheme.colors.thinDivider,
+        color = VeylineTheme.colors.simpleListItemDivider,
     )
 }
 
