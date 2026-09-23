@@ -13,11 +13,14 @@ val ToolbarHeight = 56.dp
 
 // 页面默认的边距，也就是每个页面内容区域到屏幕边缘的距离
 val DefaultHorizontalSpace = 8.dp
-val DefaultVerticalSpace = 10.dp
 
 // Button
-val ButtonHeight = 48.dp
+val ButtonMinHeight = 48.dp
 val ButtonCornerRadius = 4.dp
+val ButtonContentPaddingHorizontal = 24.dp
+val ButtonContentPaddingVertical = 10.dp
+val ButtonElevation = 2.dp
+val ButtonBorderWidth = 1.dp
 
 // Card
 val CardCornerRadius = 6.dp

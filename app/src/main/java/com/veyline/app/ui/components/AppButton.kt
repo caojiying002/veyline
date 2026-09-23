@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import android.content.res.Configuration
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.veyline.app.ui.theme.*
@@ -28,7 +29,7 @@ import com.veyline.app.ui.theme.*
  *
  * UI风格说明：
  * - 使用 Foundation 组件（Box + clickable）替代 Material 的 Surface
- * - 移除 elevation 阴影效果，符合国内APP扁平化设计
+ * - 使用未着色的轻量阴影，禁用时不显示
  * - 移除水波纹效果（indication = null）
  * - 保留按下状态的颜色变化反馈
  */
@@ -51,7 +52,13 @@ fun AppButton(
 
     Box(
         modifier = modifier
-            .height(ButtonHeight) // 48dp，与View版本按钮高度保持一致
+            .heightIn(min = ButtonMinHeight)
+            // shadow 必须放在 clip 前面，否则阴影可能被裁掉
+            .shadow(
+                // 禁用状态不显示阴影，避免不可点击的按钮看起来仍像可交互的凸起表面
+                elevation = if (enabled) ButtonElevation else 0.dp,
+                shape = shape,
+            )
             .clip(shape)
             .background(backgroundColor)
             .clickable(
@@ -61,7 +68,10 @@ fun AppButton(
                 role = Role.Button,
                 onClick = onClick
             )
-            .padding(horizontal = 24.dp),
+            .padding(
+                horizontal = ButtonContentPaddingHorizontal,
+                vertical = ButtonContentPaddingVertical,
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -111,10 +121,11 @@ fun AppSecondaryButton(
 
     Box(
         modifier = modifier
-            .height(ButtonHeight)
+            .heightIn(min = ButtonMinHeight)
+            // “透明背景+边框”的设计风格，这里不必专门添加阴影
             .clip(shape)
             .background(backgroundColor)
-            .border(width = 1.dp, color = borderColor, shape = shape)
+            .border(width = ButtonBorderWidth, color = borderColor, shape = shape)
             .clickable(
                 enabled = enabled,
                 indication = null,
@@ -122,7 +133,10 @@ fun AppSecondaryButton(
                 role = Role.Button,
                 onClick = onClick
             )
-            .padding(horizontal = 24.dp),
+            .padding(
+                horizontal = ButtonContentPaddingHorizontal,
+                vertical = ButtonContentPaddingVertical,
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -135,6 +149,7 @@ fun AppSecondaryButton(
 }
 
 // ===== Preview 组件 =====
+
 @Preview(name = "默认按钮 - 亮色")
 @Preview(name = "默认按钮 - 暗色", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -203,6 +218,7 @@ private fun AppSecondaryButtonPreview() {
 
 @Preview(name = "按钮组合 - 亮色")
 @Preview(name = "按钮组合 - 暗色", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "按钮组合 - 大字体", fontScale = 2f)
 @Composable
 private fun AppButtonCombinedPreview() {
     VeylineTheme {
@@ -227,6 +243,32 @@ private fun AppButtonCombinedPreview() {
                     onClick = {}
                 )
             }
+        }
+    }
+}
+
+@Preview(name = "按钮 - 大字体与窄宽度", widthDp = 240, fontScale = 2f)
+@Composable
+private fun AppButtonLargeFontPreview() {
+    VeylineTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(VeylineTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            AppButton(
+                text = "确认并继续使用当前设置",
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            AppSecondaryButton(
+                text = "返回修改之前的内容",
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
