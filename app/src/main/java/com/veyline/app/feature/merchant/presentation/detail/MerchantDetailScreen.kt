@@ -61,6 +61,9 @@ private const val VIEW_MODEL_KEY_PREFIX = "merchant:detail:"
 fun MerchantDetailRoute(
     merchantId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToImageViewer: (List<String>, Int) -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToVipUpgrade: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MerchantDetailViewModel =
         hiltViewModel<MerchantDetailViewModel, MerchantDetailViewModel.Factory>(
@@ -81,6 +84,9 @@ fun MerchantDetailRoute(
         onBackClick = onNavigateBack,
         onRetryClick = { viewModel.onAction(MerchantDetailAction.Retry) },
         onRefresh = { viewModel.onAction(MerchantDetailAction.Refresh) },
+        onImageClick = onNavigateToImageViewer,
+        onLoginClick = onNavigateToLogin,
+        onUpgradeVipClick = onNavigateToVipUpgrade,
         modifier = modifier,
     )
 }
@@ -91,6 +97,9 @@ fun MerchantDetailScreen(
     onBackClick: () -> Unit,
     onRetryClick: () -> Unit,
     onRefresh: () -> Unit,
+    onImageClick: (List<String>, Int) -> Unit,
+    onLoginClick: () -> Unit,
+    onUpgradeVipClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -121,9 +130,11 @@ fun MerchantDetailScreen(
                         val merchant = checkNotNull(uiState.merchant)
                         MerchantDetailContent(
                             merchant = merchant,
-                            onImageClick = {},
-                            onLoginClick = {},
-                            onUpgradeVipClick = {},
+                            onImageClick = { index ->
+                                onImageClick(merchant.imageUrls, index)
+                            },
+                            onLoginClick = onLoginClick,
+                            onUpgradeVipClick = onUpgradeVipClick,
                             contentPadding = bottomInsets.asPaddingValues(),
                             modifier = Modifier.fillMaxSize(),
                         )

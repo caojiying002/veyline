@@ -13,7 +13,7 @@ import com.veyline.app.feature.merchant.presentation.province.MerchantProvinceSe
 /**
  * 应用唯一的导航图，注册所有目的地及其跳转关系。
  *
- * 页面层只通过回调向上抛出用户事件，不直接持有 [navController]；跳转、路由参数解析、
+ * 页面层只通过回调向上抛出用户事件，不直接持有 `navController`；跳转、路由参数解析、
  * 跨页面结果回传等导航相关逻辑集中在这里组装。
  */
 @Composable
@@ -53,6 +53,13 @@ fun AppNavigation(
             MerchantDetailRoute(
                 merchantId = merchantId,
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToImageViewer = { _, _ ->
+                    // TODO 接入大图浏览页
+                },
+                onNavigateToLogin = {
+                    // TODO 接入登录页面
+                },
+                onNavigateToVipUpgrade = {}, // TODO VIP升级页尚未实现
             )
         }
 
