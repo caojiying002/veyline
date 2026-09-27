@@ -1,5 +1,6 @@
 package com.veyline.app.feature.merchant.presentation.detail
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -57,6 +59,20 @@ import com.veyline.app.ui.theme.VeylineTheme
 
 private const val VIEW_MODEL_KEY_PREFIX = "merchant:detail:"
 
+/**
+ * 商家详情页面的有状态入口。
+ *
+ * 负责获取 Hilt 管理的 ViewModel、以生命周期感知的方式收集页面状态，并触发首次加载。
+ * 登录、升级 VIP、查看大图等跳转不在这里处理，统一转交给导航层传入的回调。
+ *
+ * @param merchantId 要展示的商家 ID
+ * @param onNavigateBack 请求返回上一页时执行的导航操作
+ * @param onNavigateToImageViewer 点击图片时执行的导航操作，参数为图片列表和点击的图片索引
+ * @param onNavigateToLogin 点击登录引导按钮时执行的导航操作
+ * @param onNavigateToVipUpgrade 点击升级 VIP 引导按钮时执行的导航操作
+ * @param modifier 传递给无状态页面根容器的 [Modifier]
+ * @param viewModel 商家详情页面的 ViewModel，默认由 Hilt 提供
+ */
 @Composable
 fun MerchantDetailRoute(
     merchantId: String,
@@ -91,6 +107,24 @@ fun MerchantDetailRoute(
     )
 }
 
+/**
+ * 商家详情页面的无状态 UI。
+ *
+ * 页面根据 [uiState] 展示商家详情、全屏加载或全屏错误；刷新期间保留已有内容，
+ * 通过 [PullToRefreshBox] 的指示器代替整页替换成加载态。
+ *
+ * 标题栏负责处理顶部状态栏 Insets，内容区域通过 [MerchantDetailContent] 的
+ * contentPadding 处理底部安全区域。
+ *
+ * @param uiState 当前页面状态
+ * @param onBackClick 点击标题栏返回区域时执行的操作
+ * @param onRetryClick 在全屏错误状态下点击重试按钮时执行的操作
+ * @param onRefresh 下拉刷新时执行的操作
+ * @param onImageClick 点击商家图片时执行的操作，参数为图片列表和点击的图片索引
+ * @param onLoginClick 点击登录引导按钮时执行的操作
+ * @param onUpgradeVipClick 点击升级 VIP 引导按钮时执行的操作
+ * @param modifier 应用于页面根容器的 [Modifier]
+ */
 @Composable
 fun MerchantDetailScreen(
     uiState: MerchantDetailUiState,
@@ -167,6 +201,16 @@ fun MerchantDetailScreen(
     }
 }
 
+/**
+ * 商家详情的可滚动内容区域，依次展示图片网格、基本信息卡片和联系方式卡片。
+ *
+ * @param merchant 商家详情领域模型
+ * @param onImageClick 点击图片时执行的操作，参数为点击的图片索引
+ * @param onLoginClick 点击登录引导按钮时执行的操作
+ * @param onUpgradeVipClick 点击升级 VIP 引导按钮时执行的操作
+ * @param contentPadding 内容区域的额外内边距，用于避让底部安全区域
+ * @param modifier 应用于内容区域根容器的 [Modifier]
+ */
 @Composable
 private fun MerchantDetailContent(
     merchant: MerchantDetail,
@@ -208,6 +252,12 @@ private fun MerchantDetailContent(
     }
 }
 
+/**
+ * 展示商家名称、所在省份和详情正文的卡片
+ *
+ * @param merchant 商家详情领域模型
+ * @param modifier 应用于卡片根容器的 [Modifier]
+ */
 @Composable
 private fun MerchantBasicInfoCard(
     merchant: MerchantDetail,
@@ -251,6 +301,17 @@ private fun MerchantBasicInfoCard(
     }
 }
 
+/**
+ * 根据 [MerchantContactAccess] 展示联系方式区域，具体样式由各分支自行决定。
+ *
+ * 四个分支进行显式判断，不使用 else 兜底，新增状态时编译器会提示遗漏；
+ * [MerchantContactAccess.Unavailable] 不展示联系方式区域。
+ *
+ * @param contactAccess 当前用户查看联系方式的权限状态
+ * @param onLoginClick 点击登录引导按钮时执行的操作
+ * @param onUpgradeVipClick 点击升级 VIP 引导按钮时执行的操作
+ * @param modifier 应用于卡片根容器的 [Modifier]
+ */
 @Composable
 private fun MerchantContactCard(
     contactAccess: MerchantContactAccess,
@@ -285,6 +346,12 @@ private fun MerchantContactCard(
     }
 }
 
+/**
+ * 未登录时的联系方式提示卡片，引导用户登录
+ *
+ * @param onLoginClick 点击登录按钮时执行的操作
+ * @param modifier 应用于卡片根容器的 [Modifier]
+ */
 @Composable
 private fun ContactLoginRequiredCard(
     onLoginClick: () -> Unit,
@@ -315,6 +382,12 @@ private fun ContactLoginRequiredCard(
     }
 }
 
+/**
+ * 已登录但非 VIP 时的联系方式提示卡片，引导用户升级 VIP
+ *
+ * @param onUpgradeVipClick 点击升级 VIP 按钮时执行的操作
+ * @param modifier 应用于卡片根容器的 [Modifier]
+ */
 @Composable
 private fun ContactVipRequiredCard(
     onUpgradeVipClick: () -> Unit,
@@ -342,5 +415,116 @@ private fun ContactVipRequiredCard(
                     .widthIn(min = 140.dp),
             )
         }
+    }
+}
+
+// ===== Preview 组件 =====
+
+/** 构造 Preview 用的商家详情数据，联系方式状态由调用方指定 */
+private fun previewMerchantDetail(
+    contactAccess: MerchantContactAccess,
+): MerchantDetail =
+    MerchantDetail(
+        id = "merchant-a",
+        name = "示例商家",
+        provinceCode = "110000",
+        imageUrls = listOf(
+            "https://example.com/image-1.jpg",
+            "https://example.com/image-2.jpg",
+        ),
+        description = "这里是商家详情正文，用于检查较长文字在卡片中的换行、间距和整体展示效果。",
+        contactAccess = contactAccess,
+    )
+
+@Preview(name = "商家详情 - 可查看联系方式", showSystemUi = true)
+@Preview(name = "商家详情 - 可查看联系方式 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MerchantDetailContactAvailablePreview() {
+    val merchant = previewMerchantDetail(
+        contactAccess = MerchantContactAccess.Available(
+            contact = "电话：13800000000\n微信：veyline_example",
+        )
+    )
+
+    VeylineTheme {
+        MerchantDetailScreen(
+            uiState = MerchantDetailUiState(
+                merchant = merchant,
+            ),
+            onBackClick = {},
+            onRetryClick = {},
+            onRefresh = {},
+            onImageClick = { _, _ -> },
+            onLoginClick = {},
+            onUpgradeVipClick = {},
+        )
+    }
+}
+
+@Preview(name = "商家详情 - 需要登录", showSystemUi = true)
+@Preview(name = "商家详情 - 需要登录 - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MerchantDetailLoginRequiredPreview() {
+    VeylineTheme {
+        MerchantDetailScreen(
+            uiState = MerchantDetailUiState(
+                merchant = previewMerchantDetail(
+                    contactAccess = MerchantContactAccess.LoginRequired,
+                ),
+            ),
+            onBackClick = {},
+            onRetryClick = {},
+            onRefresh = {},
+            onImageClick = { _, _ -> },
+            onLoginClick = {},
+            onUpgradeVipClick = {},
+        )
+    }
+}
+
+@Preview(name = "商家详情 - 需要升级 VIP", showSystemUi = true)
+@Preview(name = "商家详情 - 需要升级 VIP - 暗色", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MerchantDetailVipRequiredPreview() {
+    VeylineTheme {
+        MerchantDetailScreen(
+            uiState = MerchantDetailUiState(
+                merchant = previewMerchantDetail(
+                    contactAccess = MerchantContactAccess.VipRequired,
+                ),
+            ),
+            onBackClick = {},
+            onRetryClick = {},
+            onRefresh = {},
+            onImageClick = { _, _ -> },
+            onLoginClick = {},
+            onUpgradeVipClick = {},
+        )
+    }
+}
+
+@Preview(name = "商家详情 - 大字体", showSystemUi = true, fontScale = 2f)
+@Composable
+private fun MerchantDetailLargeFontPreview() {
+    // 使用 VipRequired 因为升级提示和按钮文案更长，更容易暴露布局问题
+    // 去掉图片，确保联系方式区域在首屏内可见
+    val merchant = previewMerchantDetail(
+        contactAccess = MerchantContactAccess.VipRequired,
+    ).copy(
+        imageUrls = emptyList(),
+    )
+
+    VeylineTheme {
+        MerchantDetailScreen(
+            uiState = MerchantDetailUiState(
+                merchant = merchant,
+            ),
+            onBackClick = {},
+            onRetryClick = {},
+            onRefresh = {},
+            onImageClick = { _, _ -> },
+            onLoginClick = {},
+            onUpgradeVipClick = {},
+        )
     }
 }
