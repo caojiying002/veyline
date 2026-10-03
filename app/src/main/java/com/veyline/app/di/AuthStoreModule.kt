@@ -19,7 +19,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object AuthModule {
+object AuthStoreModule {
 
     /** 该文件 DataStore 的唯一创建点，进程内只有一个实例 */
     private val Context.authDataStore by preferencesDataStore(
