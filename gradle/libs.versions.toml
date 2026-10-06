@@ -26,6 +26,7 @@ androidxHilt = "1.4.0"
 paging = "3.5.1"
 coil = "3.6.0"
 ultraSwipeRefresh = "1.6.0"
+turbine = "1.2.1"
 mockk = "1.14.11"
 
 [libraries]
@@ -93,6 +94,7 @@ ultraswiperefresh-classic = { group = "com.github.jenly1314.UltraSwipeRefresh", 
 
 # 测试依赖
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+cashapp-turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
 
