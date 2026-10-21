@@ -78,7 +78,7 @@ android {
     defaultConfig {
         applicationId = "com.veyline.app"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
