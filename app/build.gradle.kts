@@ -117,9 +117,11 @@ android {
             optimization {
                 enable = false
             }
-            // 正式打release包不应该用debug版本的keystore，这里签名只是为了让release包能正常安装运行
-            // 有时候需要查看release包运行起来的一些特性，比如日志打印是否隐藏
-            //signingConfig = signingConfigs.getByName("debug")
+            // TODO: 正式发布前换成自己的 release 签名配置
+            // 正式对外发布的 release 包不应该用 debug keystore 签名；这里先用 debug
+            // 签名是为了让 release 包能正常安装运行，方便验证 release 特有的行为
+            // （比如日志打印是否被正确隐藏）。不能带着这个签名发布到任何正式渠道。
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
