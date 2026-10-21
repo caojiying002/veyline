@@ -1,5 +1,6 @@
 package com.veyline.app.feature.auth.presentation.login
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import com.veyline.app.ui.theme.withLineHeightFix
 
 private const val VIEW_MODEL_KEY = "auth:login"
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun LoginRoute(
     onNavigateBack: () -> Unit,
@@ -66,9 +68,8 @@ fun LoginRoute(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnLoginSuccess by rememberUpdatedState(onLoginSuccess)
-    val resources = LocalResources.current
 
-    LaunchedEffect(viewModel, lifecycleOwner, context) {
+    LaunchedEffect(viewModel) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.effect.collect { effect ->
                 when (effect) {
@@ -76,8 +77,8 @@ fun LoginRoute(
 
                     is LoginEffect.ShowGeneralError -> {
                         val message = when (val error = effect.error) {
-                            UiError.Connection -> resources.getString(R.string.error_connection)
-                            UiError.Technical -> resources.getString(R.string.error_technical)
+                            UiError.Connection -> context.getString(R.string.error_connection)
+                            UiError.Technical -> context.getString(R.string.error_technical)
                             is UiError.DisplayReady -> error.message
                         }
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()     // 未来可能改用国内风格自定义的Toast类似物
