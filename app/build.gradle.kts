@@ -71,7 +71,7 @@ android {
     namespace = "com.veyline.app"
     compileSdk {
         version = release(37) {
-            minorApiLevel = 1
+            minorApiLevel = 2
         }
     }
 
