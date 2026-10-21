@@ -146,7 +146,6 @@ fun MerchantListScreen(
             onCitySelectionClick = onProvinceSelectionClick,
         )
 
-        // 后续在这里接入列表及加载、错误、空状态
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -229,9 +228,7 @@ fun MerchantListScreen(
     }
 }
 
-/**
- * 将分页加载异常转换为全屏错误提示文案。
- */
+/** 将分页加载异常转换为全屏错误提示文案 */
 @Composable
 private fun pagingErrorMessage(error: Throwable): String {
     val uiError = (error as? PagingFailureException)?.toUiError()
