@@ -38,4 +38,9 @@
     <string name="merchant_contact_login_required">登录后才能查看联系方式</string>
     <string name="merchant_contact_vip_required">升级VIP后才能查看联系方式</string>
 
+    <string name="login_welcome_title">欢迎回来</string>
+    <string name="login_welcome_subtitle">登录 Veyline，继续探索</string>
+    <string name="login_name_label">请输入用户名</string>
+    <string name="login_password_label">请输入密码</string>
+
 </resources>

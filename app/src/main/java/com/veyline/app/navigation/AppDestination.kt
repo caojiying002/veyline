@@ -27,3 +27,7 @@ data class MerchantDetailDestination(
 /** 商家省份选择页 */
 @Serializable
 data object MerchantProvinceSelectionDestination
+
+/** 登录页 */
+@Serializable
+data object LoginDestination

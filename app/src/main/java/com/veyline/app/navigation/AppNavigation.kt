@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.veyline.app.feature.auth.presentation.login.LoginRoute
 import com.veyline.app.feature.merchant.presentation.detail.MerchantDetailRoute
 import com.veyline.app.feature.merchant.presentation.list.MerchantListRoute
 import com.veyline.app.feature.merchant.presentation.province.MerchantProvinceSelectionRoute
@@ -57,7 +58,7 @@ fun AppNavigation(
                     // TODO 接入大图浏览页
                 },
                 onNavigateToLogin = {
-                    // TODO 接入登录页面
+                    navController.navigate(LoginDestination)
                 },
                 onNavigateToVipUpgrade = {}, // TODO VIP升级页尚未实现
             )
@@ -81,6 +82,13 @@ fun AppNavigation(
 
                     navController.popBackStack()
                 },
+            )
+        }
+
+        composable<LoginDestination> {
+            LoginRoute(
+                onNavigateBack = { navController.popBackStack() },
+                onLoginSuccess = { navController.popBackStack() },
             )
         }
     }
