@@ -3,6 +3,7 @@ package com.veyline.app.data.network
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.veyline.app.data.network.exception.EmptyResponseBodyException
+import com.veyline.app.data.network.exception.MissingAuthTokenException
 import com.veyline.app.data.network.exception.MissingDataException
 import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.NoData
@@ -95,6 +96,9 @@ private suspend fun <Body, Result> executeApiCall(
     } catch (exception: JsonEncodingException) {
         // JsonEncodingException 继承 IOException，必须在通用 IOException 之前捕获。
         ApiResult.Failure.Serialization(exception)
+    } catch (exception: MissingAuthTokenException) {
+        // MissingAuthTokenException 继承 IOException，必须在通用 IOException 之前捕获。
+        ApiResult.Failure.AuthRequired(exception)
     } catch (exception: HttpException) {
         ApiResult.Failure.Http(
             statusCode = exception.code(),

@@ -10,13 +10,16 @@ import com.veyline.app.data.paging.PagingFailureException
  * [UiError.Technical]。如果具体业务已经确认某个错误码的含义和展示文案，应先完成对应的
  * 特殊处理，再将未识别的失败交给本函数。
  *
- * 表单字段验证、登录失效，以及会改变页面处理流程的特殊业务错误，不应只依赖本函数的
+ * 表单字段验证、需要登录或登录失效，以及会改变页面处理流程的特殊业务错误，不应只依赖本函数的
  * 默认结果，需由相应页面或全局机制单独处理。
  */
 internal fun ApiResult.Failure.toUiError(): UiError =
     when (this) {
         is ApiResult.Failure.Network -> UiError.Connection
 
+        // 调用方应该在走到这里之前先识别 AuthRequired 并引导登录；
+        // 这里兜底降级为通用错误，避免崩溃或误提示网络连接失败。
+        is ApiResult.Failure.AuthRequired,
         is ApiResult.Failure.Business,
         is ApiResult.Failure.Validation,
         is ApiResult.Failure.Http,

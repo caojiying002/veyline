@@ -1,5 +1,6 @@
 package com.veyline.app.data.network.result
 
+import com.veyline.app.data.network.exception.MissingAuthTokenException
 import java.io.IOException
 
 /**
@@ -39,6 +40,19 @@ sealed interface ApiResult<out T> {
      * 重复维护所有失败分支。
      */
     sealed interface Failure : ApiResult<Nothing> {
+
+        /**
+         * 请求要求携带登录凭证，但本地没有登录，因此请求没有真正发出。
+         *
+         * 不是服务端返回的失败，是 [com.veyline.app.data.network.interceptor.AuthInterceptor]
+         * 在发出请求前就本地判定的前置条件。调用方应该在转换为通用 UI 错误之前先识别这个分支，
+         * 引导用户登录，不要当作一次普通的请求失败展示。
+         *
+         * @property exception 触发本次判定的原始异常，仅用于日志与诊断。
+         */
+        data class AuthRequired(
+            val exception: MissingAuthTokenException,
+        ) : Failure
 
         /**
          * HTTP 请求成功，但服务端返回普通业务失败。
