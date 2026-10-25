@@ -1,5 +1,7 @@
 package com.veyline.app.feature.merchant.data.remote
 
+import com.veyline.app.data.annotation.TokenPolicy
+import com.veyline.app.data.annotation.TokenPolicy.Policy
 import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.data.network.model.PagedDataDto
 import com.veyline.app.feature.merchant.data.remote.model.MerchantDetailDto
@@ -22,6 +24,7 @@ interface MerchantApiService {
      *
      * @return 包含商家城市网络模型列表的通用 API 响应
      */
+    @TokenPolicy(Policy.OPTIONAL)
     @GET("config/merchantCity.json")
     suspend fun getMerchantProvinces(): Response<ApiResponseDto<List<MerchantProvinceDto>>>
 
@@ -36,6 +39,7 @@ interface MerchantApiService {
      * @param cityCode 城市代码；传入 `null` 时 Retrofit 省略该查询参数，表示查询全部城市
      * @return 包含商家列表分页数据的通用 API 响应
      */
+    @TokenPolicy(Policy.OPTIONAL)
     @GET("merchant/page.json")
     suspend fun getMerchants(
         @Query("page") page: Int,
@@ -49,6 +53,7 @@ interface MerchantApiService {
      * @param merchantId 商家 ID
      * @return 包含商家详情网络模型的通用 API 响应
      */
+    @TokenPolicy(Policy.OPTIONAL)
     @GET("merchant/detail.json")
     suspend fun getMerchantDetail(
         @Query("merchantId") merchantId: String

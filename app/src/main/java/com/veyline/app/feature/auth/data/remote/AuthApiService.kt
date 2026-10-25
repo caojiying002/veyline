@@ -1,5 +1,7 @@
 package com.veyline.app.feature.auth.data.remote
 
+import com.veyline.app.data.annotation.TokenPolicy
+import com.veyline.app.data.annotation.TokenPolicy.Policy
 import com.veyline.app.data.network.model.ApiResponseDto
 import com.veyline.app.feature.auth.data.remote.model.LoginRequestDto
 import retrofit2.Response
@@ -23,6 +25,7 @@ interface AuthApiService {
      * @param body 登录请求参数，包含用户名和密码
      * @return 包含登录 Token 的通用 API 响应
      */
+    @TokenPolicy(Policy.FORBIDDEN)
     @POST("auth/login.json")
     suspend fun login(
         @Body body: LoginRequestDto,

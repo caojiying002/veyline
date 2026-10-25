@@ -24,6 +24,7 @@ internal class PagingFailureException(
 /** 提取失败中可用于异常链诊断的原始原因。 */
 private fun ApiResult.Failure.causeOrNull(): Throwable? =
     when (this) {
+        is ApiResult.Failure.AuthRequired -> exception
         is ApiResult.Failure.Network -> exception
         is ApiResult.Failure.Http -> exception
         is ApiResult.Failure.Serialization -> exception

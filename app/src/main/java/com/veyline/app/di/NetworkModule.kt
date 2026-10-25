@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import com.veyline.app.BuildConfig
 import com.veyline.app.data.network.adapter.ApiResponseJsonAdapterFactory
 import com.veyline.app.data.network.adapter.NoDataJsonAdapter
+import com.veyline.app.data.network.interceptor.AuthInterceptor
 import com.veyline.app.data.network.interceptor.UserAgentInterceptor
 import dagger.Module
 import dagger.Provides
@@ -30,11 +31,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient =
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+    ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(
                 UserAgentInterceptor(BuildConfig.API_USER_AGENT)
             )
+            .addInterceptor(authInterceptor)
             .apply {
                 if (BuildConfig.DEBUG) {
                     addInterceptor(
