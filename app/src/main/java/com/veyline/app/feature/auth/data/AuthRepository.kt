@@ -7,8 +7,6 @@ import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.auth.data.remote.AuthApiService
 import com.veyline.app.feature.auth.data.remote.model.LoginRequestDto
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
@@ -72,22 +70,27 @@ class AuthRepository @Inject constructor(
      * 状态）时才返回 [ApiResult.Failure]
      */
     suspend fun logout(): ApiResult<Unit> {
+        var clearException: IOException? = null
         try {
-            try {
-                // 有意忽略服务端请求的结果：无论成功与否，都要退出登录
-                apiCall { apiService.logout() }
-            } finally {
-                // 只有本地清除 Token 不可取消，服务端请求仍然允许取消
-                withContext(NonCancellable) {
+            // 有意忽略服务端请求的结果：无论成功与否，都要退出登录
+            apiCall { apiService.logout() }
+        } finally {
+            // 只有本地清除 Token 不可取消，服务端请求仍然允许取消
+            withContext(NonCancellable) {
+                try {
                     authTokenStore.clearToken()
+                } catch (exception: IOException) {
+                    // 在 finally 内部捕获 IOException，避免它覆盖正在传播的 CancellationException
+                    clearException = exception
                 }
             }
-            return ApiResult.Success(Unit)
-        } catch (exception: IOException) {
-            // 协程取消与 DataStore 写入失败同时发生的概率极低；一旦发生，finally 中的
-            // IOException 会顶替正在传播的取消，这里重新抛出取消，避免吞掉它
-            currentCoroutineContext().ensureActive()
-            return ApiResult.Failure.Unexpected(exception)
         }
+
+        if (clearException != null) {
+            // DataStore 写入失败，发生的概率极低
+            return ApiResult.Failure.Unexpected(clearException)
+        }
+
+        return ApiResult.Success(Unit)
     }
 }

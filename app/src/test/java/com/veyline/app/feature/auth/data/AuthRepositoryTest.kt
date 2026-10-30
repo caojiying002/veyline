@@ -277,12 +277,7 @@ class AuthRepositoryTest {
 
         // Then: 本地仍处于登录状态，返回 Unexpected 失败并保留原始异常
         assertIs<ApiResult.Failure.Unexpected>(result)
-        // 经过 withContext 后异常可能被协程库复制，原始异常会保留在 cause 链中
-        assertTrue(
-            generateSequence(result.exception) { it.cause }
-                .any { it === ioException },
-            "异常链中应保留原始的 IOException",
-        )
+        assertSame(ioException, result.exception)
     }
 
     /** 验证退出登录时协程在服务端请求期间被取消，仍会清除 Token */
