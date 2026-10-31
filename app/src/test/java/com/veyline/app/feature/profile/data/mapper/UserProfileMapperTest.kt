@@ -34,6 +34,19 @@ class UserProfileMapperTest {
         assertEquals(expected, result)
     }
 
+    /** 验证 VIP 的到期时间等于永久标记时转换为永久会员 */
+    @Test
+    fun map_withPermanentVipExpiry_returnsPermanentVip() {
+        val result = UserProfileMapper.map(
+            createDto(isVip = true, expiredAt = PERMANENT_EXPIRY_MILLIS),
+        )
+
+        assertEquals(
+            Membership.Vip(VipExpiry.Permanent),
+            result.membership,
+        )
+    }
+
     /** 验证任一必要字段缺失或空白时抛出 [InvalidApiDataException] */
     @Test
     fun map_withMissingRequiredFields_throwsInvalidApiDataException() {
@@ -98,6 +111,26 @@ class UserProfileMapperTest {
 
         assertEquals(Membership.Regular, missingVipResult.membership)
         assertEquals(Membership.Regular, falseVipResult.membership)
+    }
+
+    /** 验证 VIP 到期时间缺失或非正数时保留 VIP 身份，有效期按未知处理 */
+    @Test
+    fun map_withMissingOrNonPositiveVipExpiry_returnsUnknownVip() {
+        val missingExpiryResult = UserProfileMapper.map(
+            createDto(isVip = true, expiredAt = null),
+        )
+        val zeroExpiryResult = UserProfileMapper.map(
+            createDto(isVip = true, expiredAt = 0L),
+        )
+        val negativeExpiryResult = UserProfileMapper.map(
+            createDto(isVip = true, expiredAt = -1L),
+        )
+
+        val expected = Membership.Vip(VipExpiry.Unknown)
+
+        assertEquals(expected, missingExpiryResult.membership)
+        assertEquals(expected, zeroExpiryResult.membership)
+        assertEquals(expected, negativeExpiryResult.membership)
     }
 
     /** 创建一个所有字段都合法的普通用户 DTO，各测试只覆盖自己关心的字段 */
