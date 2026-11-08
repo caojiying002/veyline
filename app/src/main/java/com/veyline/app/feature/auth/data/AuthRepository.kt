@@ -7,6 +7,7 @@ import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.auth.data.remote.AuthApiService
 import com.veyline.app.feature.auth.data.remote.model.LoginRequestDto
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
@@ -20,6 +21,8 @@ class AuthRepository @Inject constructor(
     private val apiService: AuthApiService,
     private val authTokenStore: AuthTokenStore,
 ) {
+
+    val isLoggedIn: Flow<Boolean> = authTokenStore.isLoggedIn
 
     /**
      * 使用用户名和密码登录。

@@ -1,16 +1,25 @@
 package com.veyline.app.feature.profile.presentation
 
+import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.veyline.app.data.network.result.ApiResult
 import com.veyline.app.feature.auth.data.AuthRepository
 import com.veyline.app.feature.profile.data.ProfileRepository
 import com.veyline.app.feature.profile.domain.model.UserProfile
 import com.veyline.app.ui.error.UiError
+import com.veyline.app.ui.error.toUiError
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface ProfileLoadState {
@@ -83,4 +92,106 @@ class ProfileViewModel @Inject constructor(
 
     private val _effect = Channel<ProfileEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    private var loadProfileJob: Job? = null
+
+    private var logoutJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            authRepository.isLoggedIn
+                .distinctUntilChanged()
+                .collect { isLoggedIn ->
+                    onLoggedInChanged(isLoggedIn)
+                }
+        }
+    }
+
+    private fun onLoggedInChanged(isLoggedIn: Boolean) {
+        // 登录状态一变，旧的 Profile 请求就不再有意义；
+        // 登录和退出都要先取消，避免误显示上一个用户状态
+        loadProfileJob?.cancel()
+
+        if (isLoggedIn) {
+            _uiState.update {
+                it.copy(
+                    accountState = ProfileAccountState.LoggedIn(ProfileLoadState.Loading)
+                )
+            }
+            loadProfile()
+        } else {
+            _uiState.update { it.copy(accountState = ProfileAccountState.LoggedOut) }
+        }
+    }
+
+    @MainThread
+    fun onAction(action: ProfileAction) {
+        when (action) {
+            ProfileAction.Refresh,
+            ProfileAction.Retry -> loadProfile()
+
+            ProfileAction.Logout -> logout()
+        }
+    }
+
+    private fun loadProfile() {
+        if (
+            loadProfileJob?.isActive == true ||
+            _uiState.value.isLoggingOut ||
+            _uiState.value.accountState !is ProfileAccountState.LoggedIn
+        ) {
+            return
+        }
+
+        updateLoadState(ProfileLoadState.Loading)
+        loadProfileJob = viewModelScope.launch {
+            val result = profileRepository.getProfile()
+            // 登录状态变化时本请求会被取消；写回前显式检查，防止上一个用户的资料写进当前状态
+            ensureActive()
+            when (result) {
+                is ApiResult.Success -> updateLoadState(
+                    ProfileLoadState.Success(result.data)
+                )
+                is ApiResult.Failure -> updateLoadState(
+                    ProfileLoadState.Error(result.toUiError())
+                )
+            }
+        }
+    }
+
+    private fun updateLoadState(loadState: ProfileLoadState) {
+        _uiState.update { state ->
+            if (state.accountState is ProfileAccountState.LoggedIn) {
+                state.copy(accountState = ProfileAccountState.LoggedIn(loadState))
+            } else {
+                state
+            }
+        }
+    }
+
+    private fun logout() {
+        if (
+            logoutJob?.isActive == true ||
+            _uiState.value.accountState !is ProfileAccountState.LoggedIn
+        ) {
+            return
+        }
+
+        _uiState.update { it.copy(isLoggingOut = true) }
+        logoutJob = viewModelScope.launch {
+            val result = try {
+                authRepository.logout()
+            } finally {
+                // 确保成功、失败或取消，都结束退出进度
+                _uiState.update { it.copy(isLoggingOut = false) }
+            }
+
+            when (result) {
+                is ApiResult.Success -> _effect.send(ProfileEffect.LogoutSucceeded)
+                is ApiResult.Failure -> _effect.send(
+                    ProfileEffect.ShowGeneralError(result.toUiError())
+                )
+            }
+        }
+    }
 }
