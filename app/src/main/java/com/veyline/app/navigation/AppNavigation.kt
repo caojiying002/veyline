@@ -10,6 +10,7 @@ import com.veyline.app.feature.auth.presentation.login.LoginRoute
 import com.veyline.app.feature.merchant.presentation.detail.MerchantDetailRoute
 import com.veyline.app.feature.merchant.presentation.list.MerchantListRoute
 import com.veyline.app.feature.merchant.presentation.province.MerchantProvinceSelectionRoute
+import com.veyline.app.feature.profile.presentation.ProfileRoute
 
 /**
  * 应用唯一的导航图，注册所有目的地及其跳转关系。
@@ -89,6 +90,15 @@ fun AppNavigation(
             LoginRoute(
                 onNavigateBack = { navController.popBackStack() },
                 onLoginSuccess = { navController.popBackStack() },
+            )
+        }
+
+        composable<ProfileDestination> {
+            ProfileRoute(
+                onNavigateToLogin = {
+                    navController.navigate(LoginDestination)
+                },
+                onNavigateToRegister = {}, // TODO 注册页尚未实现
             )
         }
     }

@@ -31,3 +31,7 @@ data object MerchantProvinceSelectionDestination
 /** 登录页 */
 @Serializable
 data object LoginDestination
+
+/** 个人中心页 */
+@Serializable
+data object ProfileDestination
